@@ -1,0 +1,48 @@
+@import 'tailwindcss';
+@import 'uniwind';
+
+@theme {
+  /* ── AI brand palette ── */
+  --color-ai-primary: #6366f1;
+  --color-ai-primary-foreground: #ffffff;
+  --color-ai-secondary: #8b5cf6;
+  --color-ai-secondary-foreground: #ffffff;
+  --color-ai-accent: #a78bfa;
+  --color-ai-accent-foreground: #1e1b4b;
+
+  /* ── Surface & background ── */
+  --color-ai-surface: #f8fafc;
+  --color-ai-surface-alt: #f1f5f9;
+  --color-ai-background: #ffffff;
+  --color-ai-foreground: #0f172a;
+
+  /* ── Semantic ── */
+  --color-ai-muted: #94a3b8;
+  --color-ai-muted-foreground: #64748b;
+  --color-ai-border: #e2e8f0;
+  --color-ai-ring: #6366f1;
+  --color-ai-destructive: #ef4444;
+  --color-ai-destructive-foreground: #ffffff;
+  --color-ai-success: #22c55e;
+  --color-ai-success-foreground: #ffffff;
+  --color-ai-warning: #f59e0b;
+  --color-ai-warning-foreground: #1e1b4b;
+
+  /* ── Dark overrides (consumed via dark: prefix) ── */
+  --color-ai-dark-surface: #0f172a;
+  --color-ai-dark-surface-alt: #1e293b;
+  --color-ai-dark-background: #020617;
+  --color-ai-dark-foreground: #f8fafc;
+  --color-ai-dark-border: #334155;
+
+  /* ── Border radii ── */
+  --radius-ai-sm: 0.375rem;
+  --radius-ai-md: 0.5rem;
+  --radius-ai-lg: 0.75rem;
+  --radius-ai-xl: 1rem;
+  --radius-ai-full: 9999px;
+
+  /* ── Font families ── */
+  --font-ai-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-ai-mono: 'JetBrains Mono', ui-monospace, monospace;
+}

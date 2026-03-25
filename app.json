@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "expo-ai-elements",
+    "slug": "expo-ai-elements",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "expo-ai-elements",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.expo.aielements"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.expo.aielements"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}
