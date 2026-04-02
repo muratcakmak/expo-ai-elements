@@ -14,6 +14,7 @@ import {
 import { Icon } from '@/components/ui/icon';
 import * as React from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDrawerStatus } from '@react-navigation/drawer';
 
 const CATEGORY_ICONS: Record<ComponentCategory, LucideIcon> = {
@@ -28,6 +29,7 @@ const CATEGORY_ICONS: Record<ComponentCategory, LucideIcon> = {
 export function Sidebar({ navigation }: { navigation?: any }) {
   const router = useRouter();
   const pathname = usePathname();
+  const insets = useSafeAreaInsets();
 
   const navigate = React.useCallback((path: string) => {
     router.push(path as any);
@@ -35,7 +37,7 @@ export function Sidebar({ navigation }: { navigation?: any }) {
   }, [router, navigation]);
 
   return (
-    <ScrollView className="bg-background flex-1 pt-2" showsVerticalScrollIndicator={false}>
+    <ScrollView className="bg-background flex-1" style={{ paddingTop: insets.top + 8 }} showsVerticalScrollIndicator={false}>
       {/* Home link */}
       <Pressable
         className={cn(
