@@ -26,14 +26,10 @@ const MessageResponse = React.memo(
       return () => clearTimeout(timer);
     }, [children, isStreaming]);
 
-    // Use commonmark during streaming (single text view, no segment overlap).
-    // Switch to github flavor when done (enables tables + block LaTeX).
-    const flavor = isStreaming ? 'commonmark' : 'github';
-
     return (
       <View className={cn('flex-1', className)} collapsable={false}>
         {displayText.length > 0 ? (
-          <EnrichedMarkdownText markdown={displayText} flavor={flavor} />
+          <EnrichedMarkdownText markdown={displayText} flavor="github" />
         ) : isStreaming ? (
           <Shimmer>Thinking...</Shimmer>
         ) : null}
