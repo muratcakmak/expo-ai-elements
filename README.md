@@ -1,73 +1,103 @@
-# Minimal Uniwind Template
+# expo-ai-elements
 
-This is a [React Native](https://reactnative.dev/) project built with [Expo](https://expo.dev/) and [React Native Reusables](https://reactnativereusables.com).
+AI chat UI components for React Native — the mobile equivalent of [Vercel AI Elements](https://elements.ai-sdk.dev).
 
-It was initialized using the following command, then the `Minimal (Uniwind)` template was selected when prompted:
+Built with [React Native Reusables](https://reactnativereusables.com) (shadcn/ui for RN) + [Uniwind](https://uniwind.dev) (Tailwind CSS for RN).
 
-```bash
-npx @react-native-reusables/cli@latest init
-```
+## Components
+
+**25 components** across 6 categories:
+
+| Category | Components |
+|---|---|
+| **Chatbot** | Conversation, Message, MessageResponse, Suggestion, Checkpoint, Citation, Streaming LaTeX |
+| **Code** | CodeBlock, Terminal, StackTrace, TestResults, SchemaDisplay |
+| **Reasoning** | Reasoning, ChainOfThought, Tool, Plan, Task, Agent |
+| **Content** | Artifact, FileTree, WebPreview, Attachments |
+| **Input** | PromptInput, SpeechInput, OpenInChat |
+| **Utilities** | Shimmer |
+
+## Features
+
+- Streaming markdown rendering with LaTeX math support (`$inline$` and `$$block$$`)
+- Dark/light mode with Uniwind theming
+- Drawer sidebar with component showcase (Storybook-like)
+- Full chat demo with simulated streaming
+- Built on Expo SDK 55, React Native 0.83, React 19
 
 ## Getting Started
 
-To run the development server:
-
 ```bash
-    npm run dev
-    # or
-    yarn dev
-    # or
-    pnpm dev
-    # or
-    bun dev
+# Install dependencies
+bun install
+
+# Generate native directories
+npx expo prebuild
+
+# Run on iOS
+npx expo run:ios
+
+# Run on Android
+npx expo run:android
 ```
 
-This will start the Expo Dev Server. Open the app in:
+## Stack
 
-- **iOS**: press `i` to launch in the iOS simulator _(Mac only)_
-- **Android**: press `a` to launch in the Android emulator
-- **Web**: press `w` to run in a browser
+- **Expo SDK 55** (ejected via prebuild)
+- **React Native 0.83** + React 19.2
+- **Uniwind 1.6** — Tailwind CSS bindings for RN
+- **React Native Reusables** — shadcn/ui base components
+- **react-native-enriched-markdown** — native markdown + code highlighting + LaTeX
+- **Vercel AI SDK** (`ai` + `@ai-sdk/react`) — `useChat` / `useCompletion` hooks
+- **react-native-reanimated** — animations
+- **lucide-react-native** — icons
 
-You can also scan the QR code using the [Expo Go](https://expo.dev/go) app on your device. This project fully supports running in Expo Go for quick testing on physical devices.
+## Project Structure
 
-## Adding components
-
-You can add more reusable components using the CLI:
-
-```bash
-npx react-native-reusables/cli@latest add [...components]
+```
+app/
+  _layout.tsx          # Drawer sidebar layout
+  index.tsx            # Home screen with component grid
+  chat.tsx             # Full chat demo
+  [slug].tsx           # Dynamic component preview route
+components/
+  ai/                  # AI chat components (the library)
+    message.tsx
+    conversation.tsx
+    prompt-input.tsx
+    reasoning.tsx
+    code-block.tsx
+    ... (25 total)
+  ui/                  # Base UI components (Reusables)
+  showcase/            # Sidebar + preview wrappers
+demos/                 # Demo files for each component
+lib/
+  component-registry.ts  # Component catalog for sidebar nav
 ```
 
-> e.g. `npx react-native-reusables/cli@latest add input textarea`
+## Adding Components to Your App
 
-If you don't specify any component names, you'll be prompted to select which components to add interactively. Use the `--all` flag to install all available components at once.
+Components follow the shadcn/ui copy-paste pattern. Copy any file from `components/ai/` into your project and import it:
 
-## Project Features
+```tsx
+import { Message, MessageContent, MessageResponse } from '@/components/ai';
+import { PromptInput } from '@/components/ai';
 
-- ⚛️ Built with [Expo Router](https://expo.dev/router)
-- 🎨 Styled with [Tailwind CSS](https://tailwindcss.com/) via [Uniwind](https://uniwind.dev/)
-- 📦 UI powered by [React Native Reusables](https://github.com/founded-labs/react-native-reusables)
-- 🚀 New Architecture enabled
-- 🔥 Edge to Edge enabled
-- 📱 Runs on iOS, Android, and Web
+<Message role="assistant">
+  <MessageContent>
+    <MessageResponse isStreaming={isLoading}>
+      {streamingText}
+    </MessageResponse>
+  </MessageContent>
+</Message>
+<PromptInput onSubmit={sendMessage} isLoading={isLoading} />
+```
 
-## Learn More
+## Known Limitations
 
-To dive deeper into the technologies used:
+- **Streaming jank**: `EnrichedMarkdownText` recalculates native layout on every prop change. Updates are throttled to ~80ms to mitigate. The proper fix (`react-native-streamdown` with worklet-based processing) requires `react-native-worklets` 0.8.0-bundle-mode-preview which crashes on Expo SDK 55 due to Hermes incompatibility. Will be resolved when worklets bundle mode reaches stable.
+- **LaTeX block math** (`$$...$$`) requires `flavor="github"` on `EnrichedMarkdownText`.
 
-- [React Native Docs](https://reactnative.dev/docs/getting-started)
-- [Expo Docs](https://docs.expo.dev/)
-- [Uniwind Docs](https://docs.uniwind.dev/)
-- [React Native Reusables](https://reactnativereusables.com)
+## License
 
-## Deploy with EAS
-
-The easiest way to deploy your app is with [Expo Application Services (EAS)](https://expo.dev/eas).
-
-- [EAS Build](https://docs.expo.dev/build/introduction/)
-- [EAS Updates](https://docs.expo.dev/eas-update/introduction/)
-- [EAS Submit](https://docs.expo.dev/submit/introduction/)
-
----
-
-If you enjoy using React Native Reusables, please consider giving it a ⭐ on [GitHub](https://github.com/founded-labs/react-native-reusables). Your support means a lot!
+MIT
