@@ -12,19 +12,21 @@ type PreviewProps = {
 
 export function Preview({ title, description, children, className }: PreviewProps) {
   return (
-    <ScrollView
-      className="bg-background flex-1"
-      contentContainerClassName="p-4 pb-12"
-      showsVerticalScrollIndicator={false}
-    >
-      <View className="mb-6">
-        <Text className="text-foreground text-2xl font-bold">{title}</Text>
-        {description && (
-          <Text className="text-muted-foreground mt-1 text-sm">{description}</Text>
-        )}
-      </View>
-      <View className={cn('gap-6', className)}>{children}</View>
-    </ScrollView>
+    <View className="bg-background flex-1">
+      <ScrollView
+        contentContainerClassName="p-4 pb-12"
+        showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
+      >
+        <View className="mb-6">
+          <Text className="text-foreground text-2xl font-bold">{title}</Text>
+          {description && (
+            <Text className="text-muted-foreground mt-1 text-sm">{description}</Text>
+          )}
+        </View>
+        <View className={cn('gap-6', className)}>{children}</View>
+      </ScrollView>
+    </View>
   );
 }
 

@@ -5,46 +5,47 @@ import { Text } from '@/components/ui/text';
 import { ArrowDownIcon } from 'lucide-react-native';
 import * as React from 'react';
 import {
-  FlatList,
-  type FlatListProps,
-  type ListRenderItem,
+  ScrollView,
   View,
   type ViewProps,
+  KeyboardAvoidingView,
+  Platform,
+  type NativeSyntheticEvent,
+  type NativeScrollEvent,
 } from 'react-native';
-import { KeyboardAvoidingView, Platform } from 'react-native';
 
 // --- Conversation ---
 
-type ConversationProps<T> = Omit<FlatListProps<T>, 'renderItem'> & {
-  renderItem: ListRenderItem<T>;
+type ConversationProps<T> = {
+  data: T[] | null | undefined;
+  renderItem: (info: { item: T; index: number }) => React.ReactNode;
+  keyExtractor?: (item: T, index: number) => string;
   className?: string;
 };
 
 function Conversation<T>({
   data,
   renderItem,
+  keyExtractor,
   className,
-  ...props
 }: ConversationProps<T>) {
-  const listRef = React.useRef<FlatList<T>>(null);
+  const scrollRef = React.useRef<ScrollView>(null);
   const [isAtBottom, setIsAtBottom] = React.useState(true);
 
   const scrollToBottom = React.useCallback(() => {
-    if (data && data.length > 0) {
-      listRef.current?.scrollToEnd({ animated: true });
-    }
-  }, [data]);
+    scrollRef.current?.scrollToEnd({ animated: true });
+  }, []);
 
   // Auto-scroll when new data arrives and user is at bottom
   React.useEffect(() => {
-    if (isAtBottom) {
+    if (isAtBottom && data && data.length > 0) {
       const timeout = setTimeout(scrollToBottom, 50);
       return () => clearTimeout(timeout);
     }
   }, [data?.length, isAtBottom, scrollToBottom]);
 
   const handleScroll = React.useCallback(
-    (event: { nativeEvent: { contentOffset: { y: number }; contentSize: { height: number }; layoutMeasurement: { height: number } } }) => {
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
       const distanceFromBottom = contentSize.height - layoutMeasurement.height - contentOffset.y;
       setIsAtBottom(distanceFromBottom < 50);
@@ -58,17 +59,20 @@ function Conversation<T>({
       className={cn('flex-1', className)}
     >
       <View className="flex-1">
-        <FlatList
-          ref={listRef}
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(_, index) => index.toString()}
+        <ScrollView
+          ref={scrollRef}
           onScroll={handleScroll}
           scrollEventThrottle={16}
           contentContainerClassName="pb-4 pt-2"
           showsVerticalScrollIndicator={false}
-          {...props}
-        />
+          nestedScrollEnabled
+        >
+          {data?.map((item, index) => (
+            <React.Fragment key={keyExtractor ? keyExtractor(item, index) : index.toString()}>
+              {renderItem({ item, index })}
+            </React.Fragment>
+          ))}
+        </ScrollView>
         {!isAtBottom && (
           <ConversationScrollButton onPress={scrollToBottom} />
         )}
