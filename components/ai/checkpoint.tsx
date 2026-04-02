@@ -1,35 +1,29 @@
 import { cn } from '@/lib/utils';
+import { Button, type ButtonProps } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
+import { Bookmark as BookmarkIcon } from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
 import * as React from 'react';
-import { View } from 'react-native';
+import { View, type ViewProps } from 'react-native';
 
-type CheckpointProps = {
-  label: string;
-  timestamp?: Date;
-  className?: string;
-};
+// ============================================================================
+// Checkpoint - Container with separator lines
+// ============================================================================
 
-function formatTime(date: Date): string {
-  return date.toLocaleTimeString(undefined, {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
+type CheckpointProps = ViewProps;
 
 const Checkpoint = React.memo(function Checkpoint({
-  label,
-  timestamp,
   className,
+  children,
+  ...props
 }: CheckpointProps) {
   return (
-    <View className={cn('flex-row items-center gap-3 px-4 py-2', className)}>
-      <View className="bg-border h-px flex-1" />
-      <View className="bg-muted flex-row items-center gap-1.5 rounded-full px-3 py-1">
-        <Text className="text-muted-foreground text-xs font-medium">{label}</Text>
-        {timestamp ? (
-          <Text className="text-muted-foreground/70 text-xs">{formatTime(timestamp)}</Text>
-        ) : null}
-      </View>
+    <View
+      className={cn('flex-row items-center gap-1 overflow-hidden', className)}
+      {...props}
+    >
+      {children}
       <View className="bg-border h-px flex-1" />
     </View>
   );
@@ -37,5 +31,58 @@ const Checkpoint = React.memo(function Checkpoint({
 
 Checkpoint.displayName = 'Checkpoint';
 
-export { Checkpoint };
-export type { CheckpointProps };
+// ============================================================================
+// CheckpointIcon - Customizable icon
+// ============================================================================
+
+type CheckpointIconProps = {
+  icon?: LucideIcon;
+  className?: string;
+  children?: React.ReactNode;
+};
+
+const CheckpointIcon = React.memo(function CheckpointIcon({
+  icon = BookmarkIcon,
+  className,
+  children,
+}: CheckpointIconProps) {
+  if (children) {
+    return <>{children}</>;
+  }
+
+  return <Icon as={icon} className={cn('text-muted-foreground size-4 shrink-0', className)} />;
+});
+
+CheckpointIcon.displayName = 'CheckpointIcon';
+
+// ============================================================================
+// CheckpointTrigger - Tappable label button
+// ============================================================================
+
+type CheckpointTriggerProps = Omit<ButtonProps, 'variant' | 'size'> & {
+  variant?: ButtonProps['variant'];
+  size?: ButtonProps['size'];
+};
+
+const CheckpointTrigger = React.memo(function CheckpointTrigger({
+  children,
+  variant = 'ghost',
+  size = 'sm',
+  className,
+  ...props
+}: CheckpointTriggerProps) {
+  return (
+    <Button variant={variant} size={size} className={cn(className)} {...props}>
+      {typeof children === 'string' ? (
+        <Text className="text-muted-foreground text-xs font-medium">{children}</Text>
+      ) : (
+        children
+      )}
+    </Button>
+  );
+});
+
+CheckpointTrigger.displayName = 'CheckpointTrigger';
+
+export { Checkpoint, CheckpointIcon, CheckpointTrigger };
+export type { CheckpointProps, CheckpointIconProps, CheckpointTriggerProps };

@@ -1,9 +1,11 @@
 import { cn } from '@/lib/utils';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import { CheckIcon, CircleIcon } from 'lucide-react-native';
+import * as Collapsible from '@rn-primitives/collapsible';
+import { BrainIcon, ChevronDownIcon, CircleIcon } from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
 import * as React from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -12,22 +14,130 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 
-// --- Types ---
+// --- Context ---
 
-type ThoughtStep = {
-  id: string;
-  title: string;
-  status: 'pending' | 'active' | 'complete';
+type ChainOfThoughtContextValue = {
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
 };
 
+const ChainOfThoughtContext = React.createContext<ChainOfThoughtContextValue | null>(null);
+
+function useChainOfThought() {
+  const context = React.useContext(ChainOfThoughtContext);
+  if (!context) {
+    throw new Error('ChainOfThought sub-components must be used within <ChainOfThought>');
+  }
+  return context;
+}
+
+// --- ChainOfThought (root) ---
+
 type ChainOfThoughtProps = {
-  steps: ThoughtStep[];
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
   className?: string;
 };
 
-// --- StepIndicator ---
+const ChainOfThought = React.memo(function ChainOfThought({
+  open,
+  defaultOpen = false,
+  onOpenChange,
+  children,
+  className,
+}: ChainOfThoughtProps) {
+  const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
+  const isControlled = open !== undefined;
+  const isOpen = isControlled ? open : internalOpen;
 
-const ActiveIndicator = React.memo(function ActiveIndicator() {
+  const setIsOpen = React.useCallback(
+    (value: boolean) => {
+      if (!isControlled) {
+        setInternalOpen(value);
+      }
+      onOpenChange?.(value);
+    },
+    [isControlled, onOpenChange]
+  );
+
+  const contextValue = React.useMemo(
+    () => ({ isOpen, setIsOpen }),
+    [isOpen, setIsOpen]
+  );
+
+  return (
+    <ChainOfThoughtContext.Provider value={contextValue}>
+      <View className={cn('gap-4', className)}>{children}</View>
+    </ChainOfThoughtContext.Provider>
+  );
+});
+
+ChainOfThought.displayName = 'ChainOfThought';
+
+// --- ChainOfThoughtHeader ---
+
+type ChainOfThoughtHeaderProps = {
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const ChainOfThoughtHeader = React.memo(function ChainOfThoughtHeader({
+  children,
+  className,
+}: ChainOfThoughtHeaderProps) {
+  const { isOpen, setIsOpen } = useChainOfThought();
+
+  return (
+    <Collapsible.Root open={isOpen} onOpenChange={setIsOpen}>
+      <Collapsible.Trigger asChild>
+        <Pressable
+          className={cn(
+            'flex-row items-center gap-2',
+            className
+          )}
+        >
+          <Icon as={BrainIcon} className="text-muted-foreground size-4" />
+          <Text className="text-muted-foreground flex-1 text-sm">
+            {typeof children === 'string' ? children : children ?? 'Chain of Thought'}
+          </Text>
+          <Icon
+            as={ChevronDownIcon}
+            className={cn('text-muted-foreground size-4', isOpen && 'rotate-180')}
+          />
+        </Pressable>
+      </Collapsible.Trigger>
+    </Collapsible.Root>
+  );
+});
+
+ChainOfThoughtHeader.displayName = 'ChainOfThoughtHeader';
+
+// --- ChainOfThoughtStep ---
+
+type ChainOfThoughtStepStatus = 'complete' | 'active' | 'pending';
+
+type ChainOfThoughtStepProps = {
+  icon?: LucideIcon;
+  label: string;
+  description?: string;
+  status?: ChainOfThoughtStepStatus;
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const stepStatusStyles: Record<ChainOfThoughtStepStatus, string> = {
+  active: 'text-foreground',
+  complete: 'text-muted-foreground',
+  pending: 'text-muted-foreground/50',
+};
+
+const ActivePulse = React.memo(function ActivePulse({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const opacity = useSharedValue(0.4);
 
   React.useEffect(() => {
@@ -42,63 +152,128 @@ const ActiveIndicator = React.memo(function ActiveIndicator() {
     opacity: opacity.value,
   }));
 
-  return (
-    <Animated.View style={animatedStyle}>
-      <Icon as={CircleIcon} className="size-4 text-blue-500" />
-    </Animated.View>
-  );
+  return <Animated.View style={animatedStyle}>{children}</Animated.View>;
 });
 
-ActiveIndicator.displayName = 'ActiveIndicator';
+ActivePulse.displayName = 'ActivePulse';
 
-function StepIndicator({ status }: { status: ThoughtStep['status'] }) {
-  if (status === 'complete') {
-    return <Icon as={CheckIcon} className="size-4 text-green-500" />;
-  }
-  if (status === 'active') {
-    return <ActiveIndicator />;
-  }
-  return <Icon as={CircleIcon} className="text-muted-foreground/40 size-4" />;
-}
-
-// --- ChainOfThought ---
-
-const ChainOfThought = React.memo(function ChainOfThought({
-  steps,
+const ChainOfThoughtStep = React.memo(function ChainOfThoughtStep({
+  icon: IconComponent = CircleIcon,
+  label,
+  description,
+  status = 'complete',
+  children,
   className,
-}: ChainOfThoughtProps) {
+}: ChainOfThoughtStepProps) {
+  const stepIcon = <Icon as={IconComponent} className="size-4" />;
+
   return (
-    <View className={cn('gap-2', className)}>
-      {steps.map((step, index) => (
-        <View key={step.id} className="flex-row items-center gap-3">
-          <Text
-            className={cn(
-              'w-6 text-center text-xs font-medium',
-              step.status === 'active' && 'text-blue-500',
-              step.status === 'complete' && 'text-green-500',
-              step.status === 'pending' && 'text-muted-foreground/40'
-            )}
-          >
-            {String(index + 1)}
-          </Text>
-          <StepIndicator status={step.status} />
-          <Text
-            className={cn(
-              'flex-1 text-sm',
-              step.status === 'active' && 'text-foreground font-medium',
-              step.status === 'complete' && 'text-muted-foreground',
-              step.status === 'pending' && 'text-muted-foreground/40'
-            )}
-          >
-            {step.title}
-          </Text>
-        </View>
-      ))}
+    <View className={cn('flex-row gap-2', stepStatusStyles[status], className)}>
+      <View className="relative mt-0.5">
+        {status === 'active' ? <ActivePulse>{stepIcon}</ActivePulse> : stepIcon}
+        <View className="bg-border absolute top-7 bottom-0 left-1/2 w-px -translate-x-px" />
+      </View>
+      <View className="flex-1 gap-2 overflow-hidden">
+        <Text className={cn('text-sm', stepStatusStyles[status])}>{label}</Text>
+        {description ? (
+          <Text className="text-muted-foreground text-xs">{description}</Text>
+        ) : null}
+        {children}
+      </View>
     </View>
   );
 });
 
-ChainOfThought.displayName = 'ChainOfThought';
+ChainOfThoughtStep.displayName = 'ChainOfThoughtStep';
 
-export { ChainOfThought };
-export type { ChainOfThoughtProps, ThoughtStep };
+// --- ChainOfThoughtSearchResults ---
+
+type ChainOfThoughtSearchResultsProps = {
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const ChainOfThoughtSearchResults = React.memo(function ChainOfThoughtSearchResults({
+  children,
+  className,
+}: ChainOfThoughtSearchResultsProps) {
+  return (
+    <View className={cn('flex-row flex-wrap items-center gap-2', className)}>
+      {children}
+    </View>
+  );
+});
+
+ChainOfThoughtSearchResults.displayName = 'ChainOfThoughtSearchResults';
+
+// --- ChainOfThoughtSearchResult ---
+
+type ChainOfThoughtSearchResultProps = {
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const ChainOfThoughtSearchResult = React.memo(function ChainOfThoughtSearchResult({
+  children,
+  className,
+}: ChainOfThoughtSearchResultProps) {
+  return (
+    <View
+      className={cn(
+        'bg-secondary flex-row items-center gap-1 rounded-full px-2 py-0.5',
+        className
+      )}
+    >
+      {typeof children === 'string' ? (
+        <Text className="text-secondary-foreground text-xs">{children}</Text>
+      ) : (
+        children
+      )}
+    </View>
+  );
+});
+
+ChainOfThoughtSearchResult.displayName = 'ChainOfThoughtSearchResult';
+
+// --- ChainOfThoughtContent ---
+
+type ChainOfThoughtContentProps = {
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const ChainOfThoughtContent = React.memo(function ChainOfThoughtContent({
+  children,
+  className,
+}: ChainOfThoughtContentProps) {
+  const { isOpen } = useChainOfThought();
+
+  return (
+    <Collapsible.Root open={isOpen}>
+      <Collapsible.Content>
+        <View className={cn('mt-2 gap-3', className)}>{children}</View>
+      </Collapsible.Content>
+    </Collapsible.Root>
+  );
+});
+
+ChainOfThoughtContent.displayName = 'ChainOfThoughtContent';
+
+export {
+  ChainOfThought,
+  ChainOfThoughtHeader,
+  ChainOfThoughtStep,
+  ChainOfThoughtSearchResults,
+  ChainOfThoughtSearchResult,
+  ChainOfThoughtContent,
+  useChainOfThought,
+};
+export type {
+  ChainOfThoughtProps,
+  ChainOfThoughtHeaderProps,
+  ChainOfThoughtStepProps,
+  ChainOfThoughtStepStatus,
+  ChainOfThoughtSearchResultsProps,
+  ChainOfThoughtSearchResultProps,
+  ChainOfThoughtContentProps,
+};

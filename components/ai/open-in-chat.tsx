@@ -1,65 +1,202 @@
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Text } from '@/components/ui/text';
-import { ExternalLinkIcon } from 'lucide-react-native';
+import { Button, type ButtonProps } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
+import * as DropdownMenu from '@rn-primitives/dropdown-menu';
+import { ChevronDownIcon, ExternalLinkIcon } from 'lucide-react-native';
 import * as Linking from 'expo-linking';
 import * as React from 'react';
-import { View } from 'react-native';
+import { View, type ViewProps } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
-type AppKey = 'chatgpt' | 'claude' | 'gemini';
+// --- Provider config ---
 
-type OpenInChatProps = {
-  prompt: string;
-  apps?: AppKey[];
-  className?: string;
-};
-
-const APP_CONFIG: Record<AppKey, { label: string; url: (prompt: string) => string }> = {
+const providers = {
   chatgpt: {
-    label: 'ChatGPT',
-    url: (prompt) => `https://chat.openai.com/?q=${encodeURIComponent(prompt)}`,
+    createUrl: (prompt: string) =>
+      `https://chatgpt.com/?${new URLSearchParams({ hints: 'search', prompt })}`,
+    label: 'Open in ChatGPT',
+    icon: (color: string) => (
+      <Svg width={16} height={16} viewBox="0 0 24 24" fill={color}>
+        <Path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z" />
+      </Svg>
+    ),
   },
   claude: {
-    label: 'Claude',
-    url: (prompt) => `https://claude.ai/new?q=${encodeURIComponent(prompt)}`,
+    createUrl: (q: string) => `https://claude.ai/new?${new URLSearchParams({ q })}`,
+    label: 'Open in Claude',
+    icon: (color: string) => (
+      <Svg width={16} height={16} viewBox="0 0 12 12" fill={color}>
+        <Path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M2.3545 7.9775L4.7145 6.654L4.7545 6.539L4.7145 6.475H4.6L4.205 6.451L2.856 6.4145L1.6865 6.366L0.5535 6.305L0.268 6.2445L0 5.892L0.0275 5.716L0.2675 5.5555L0.6105 5.5855L1.3705 5.637L2.5095 5.716L3.3355 5.7645L4.56 5.892H4.7545L4.782 5.8135L4.715 5.7645L4.6635 5.716L3.4845 4.918L2.2085 4.074L1.5405 3.588L1.1785 3.3425L0.9965 3.1115L0.9175 2.6075L1.2455 2.2465L1.686 2.2765L1.7985 2.307L2.245 2.65L3.199 3.388L4.4445 4.3045L4.627 4.4565L4.6995 4.405L4.709 4.3685L4.627 4.2315L3.9495 3.0085L3.2265 1.7635L2.9045 1.2475L2.8195 0.938C2.787 0.819 2.77 0.697 2.7675 0.5735L3.1415 0.067L3.348 0L3.846 0.067L4.056 0.249L4.366 0.956L4.867 2.0705L5.6445 3.5855L5.8725 4.0345L5.994 4.4505L6.0395 4.578H6.1185V4.505L6.1825 3.652L6.301 2.6045L6.416 1.257L6.456 0.877L6.644 0.422L7.0175 0.176L7.3095 0.316L7.5495 0.6585L7.516 0.8805L7.373 1.806L7.0935 3.2575L6.9115 4.2285H7.0175L7.139 4.1075L7.6315 3.4545L8.4575 2.4225L8.8225 2.0125L9.2475 1.5605L9.521 1.345H10.0375L10.4175 1.9095L10.2475 2.4925L9.7155 3.166L9.275 3.737L8.643 4.587L8.248 5.267L8.2845 5.322L8.3785 5.312L9.8065 5.009L10.578 4.869L11.4985 4.7115L11.915 4.9055L11.9605 5.103L11.7965 5.5065L10.812 5.7495L9.6575 5.9805L7.938 6.387L7.917 6.402L7.9415 6.4325L8.716 6.5055L9.047 6.5235H9.858L11.368 6.636L11.763 6.897L12 7.216L11.9605 7.4585L11.353 7.7685L10.533 7.574L8.6185 7.119L7.9625 6.9545H7.8715V7.0095L8.418 7.5435L9.421 8.4485L10.6755 9.6135L10.739 9.9025L10.578 10.13L10.408 10.1055L9.3055 9.277L8.88 8.9035L7.917 8.0935H7.853V8.1785L8.075 8.503L9.2475 10.2635L9.3085 10.8035L9.2235 10.98L8.9195 11.0865L8.5855 11.0255L7.8985 10.063L7.191 8.9795L6.6195 8.008L6.5495 8.048L6.2125 11.675L6.0545 11.86L5.69 12L5.3865 11.7695L5.2255 11.396L5.3865 10.658L5.581 9.696L5.7385 8.931L5.8815 7.981L5.9665 7.665L5.9605 7.644L5.8905 7.653L5.1735 8.6365L4.0835 10.109L3.2205 11.0315L3.0135 11.1135L2.655 10.9285L2.6885 10.5975L2.889 10.303L4.083 8.785L4.803 7.844L5.268 7.301L5.265 7.222H5.2375L2.066 9.28L1.501 9.353L1.2575 9.125L1.288 8.752L1.4035 8.6305L2.3575 7.9745L2.3545 7.9775Z"
+        />
+      </Svg>
+    ),
   },
   gemini: {
-    label: 'Gemini',
-    url: (prompt) => `https://gemini.google.com/app?q=${encodeURIComponent(prompt)}`,
+    createUrl: (q: string) =>
+      `https://gemini.google.com/app?${new URLSearchParams({ q })}`,
+    label: 'Open in Gemini',
+    icon: (color: string) => (
+      <Svg width={16} height={16} viewBox="0 0 24 24" fill={color}>
+        <Path d="M12 0C12 6.627 6.627 12 0 12c6.627 0 12 5.373 12 12 0-6.627 5.373-12 12-12-6.627 0-12-5.373-12-12z" />
+      </Svg>
+    ),
   },
+} as const;
+
+type ProviderKey = keyof typeof providers;
+
+// --- Context ---
+
+type OpenInContextValue = {
+  query: string;
 };
 
-const DEFAULT_APPS: AppKey[] = ['chatgpt', 'claude', 'gemini'];
+const OpenInContext = React.createContext<OpenInContextValue | undefined>(undefined);
 
-function OpenInChat({ prompt, apps = DEFAULT_APPS, className }: OpenInChatProps) {
-  const handleOpen = React.useCallback(
-    (app: AppKey) => {
-      const config = APP_CONFIG[app];
-      Linking.openURL(config.url(prompt));
-    },
-    [prompt]
-  );
+function useOpenInContext() {
+  const context = React.useContext(OpenInContext);
+  if (!context) {
+    throw new Error('OpenIn components must be used within an OpenIn provider');
+  }
+  return context;
+}
+
+// --- OpenIn (container) ---
+
+type OpenInProps = ViewProps & {
+  query: string;
+};
+
+function OpenIn({ query, children, ...props }: OpenInProps) {
+  const contextValue = React.useMemo(() => ({ query }), [query]);
 
   return (
-    <View className={cn('flex-row flex-wrap items-center gap-2', className)}>
-      {apps.map((app) => (
-        <Button
-          key={app}
-          variant="outline"
-          size="sm"
-          className="gap-1.5"
-          onPress={() => handleOpen(app)}
-        >
-          <Icon as={ExternalLinkIcon} className="text-muted-foreground size-3.5" />
-          <Text className="text-sm">{APP_CONFIG[app].label}</Text>
-        </Button>
-      ))}
-    </View>
+    <OpenInContext.Provider value={contextValue}>
+      <DropdownMenu.Root>
+        <View {...props}>{children}</View>
+      </DropdownMenu.Root>
+    </OpenInContext.Provider>
   );
 }
 
-OpenInChat.displayName = 'OpenInChat';
+// --- OpenInTrigger ---
 
-export { OpenInChat };
-export type { OpenInChatProps };
+type OpenInTriggerProps = ButtonProps;
+
+function OpenInTrigger({ children, className, ...props }: OpenInTriggerProps) {
+  return (
+    <DropdownMenu.Trigger asChild>
+      <Button variant="outline" className={cn('flex-row gap-1.5', className)} {...props}>
+        {children ?? (
+          <>
+            <Text className="text-sm">Open in chat</Text>
+            <Icon as={ChevronDownIcon} className="text-muted-foreground size-4" />
+          </>
+        )}
+      </Button>
+    </DropdownMenu.Trigger>
+  );
+}
+
+// --- OpenInContent ---
+
+type OpenInContentProps = React.ComponentProps<typeof DropdownMenu.Content>;
+
+function OpenInContent({ className, ...props }: OpenInContentProps) {
+  return (
+    <DropdownMenu.Content
+      className={cn('min-w-[240px]', className)}
+      align="start"
+      {...props}
+    />
+  );
+}
+
+// --- OpenInItem ---
+
+type OpenInItemProps = React.ComponentProps<typeof DropdownMenu.Item>;
+
+function OpenInItem(props: OpenInItemProps) {
+  return <DropdownMenu.Item {...props} />;
+}
+
+// --- OpenInLabel ---
+
+type OpenInLabelProps = React.ComponentProps<typeof DropdownMenu.Label>;
+
+function OpenInLabel(props: OpenInLabelProps) {
+  return <DropdownMenu.Label {...props} />;
+}
+
+// --- OpenInSeparator ---
+
+type OpenInSeparatorProps = React.ComponentProps<typeof DropdownMenu.Separator>;
+
+function OpenInSeparator(props: OpenInSeparatorProps) {
+  return <DropdownMenu.Separator {...props} />;
+}
+
+// --- Provider-specific items ---
+
+function createProviderItem(providerKey: ProviderKey, displayName: string) {
+  const provider = providers[providerKey];
+
+  const ProviderItem = React.memo(function ProviderItem({ className, ...props }: OpenInItemProps) {
+    const { query } = useOpenInContext();
+
+    const handlePress = React.useCallback(() => {
+      const url = provider.createUrl(query);
+      Linking.openURL(url);
+    }, [query]);
+
+    return (
+      <DropdownMenu.Item
+        className={cn('flex-row items-center gap-2', className)}
+        onPress={handlePress}
+        {...props}
+      >
+        <View className="shrink-0">{provider.icon('currentColor')}</View>
+        <Text className="flex-1 text-sm">{provider.label}</Text>
+        <Icon as={ExternalLinkIcon} className="text-muted-foreground size-4 shrink-0" />
+      </DropdownMenu.Item>
+    );
+  });
+
+  ProviderItem.displayName = displayName;
+  return ProviderItem;
+}
+
+const OpenInChatGPT = createProviderItem('chatgpt', 'OpenInChatGPT');
+const OpenInClaude = createProviderItem('claude', 'OpenInClaude');
+const OpenInGemini = createProviderItem('gemini', 'OpenInGemini');
+
+OpenIn.displayName = 'OpenIn';
+OpenInTrigger.displayName = 'OpenInTrigger';
+OpenInContent.displayName = 'OpenInContent';
+OpenInItem.displayName = 'OpenInItem';
+OpenInLabel.displayName = 'OpenInLabel';
+OpenInSeparator.displayName = 'OpenInSeparator';
+
+export {
+  OpenIn,
+  OpenInTrigger,
+  OpenInContent,
+  OpenInItem,
+  OpenInLabel,
+  OpenInSeparator,
+  OpenInChatGPT,
+  OpenInClaude,
+  OpenInGemini,
+};
+export type {
+  OpenInProps,
+  OpenInTriggerProps,
+  OpenInContentProps,
+  OpenInItemProps,
+  OpenInLabelProps,
+  OpenInSeparatorProps,
+};

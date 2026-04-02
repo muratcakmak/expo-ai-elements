@@ -1,4 +1,10 @@
-import { CodeBlock } from '@/components/ai';
+import {
+  CodeBlock,
+  CodeBlockContent,
+  CodeBlockCopyButton,
+  CodeBlockHeader,
+  CodeBlockTitle,
+} from '@/components/ai/code-block';
 import { PreviewSection } from '@/components/showcase/preview';
 import { View } from 'react-native';
 
@@ -19,12 +25,24 @@ for i in range(10):
 export function CodeBlockDemo() {
   return (
     <View className="gap-6">
-      <PreviewSection title="JavaScript" description="With line numbers">
-        <CodeBlock code={jsCode} language="javascript" showLineNumbers />
+      <PreviewSection title="JavaScript" description="With line numbers and copy button">
+        <CodeBlock code={jsCode} language="javascript">
+          <CodeBlockHeader>
+            <CodeBlockTitle>javascript</CodeBlockTitle>
+            <CodeBlockCopyButton />
+          </CodeBlockHeader>
+          <CodeBlockContent code={jsCode} showLineNumbers />
+        </CodeBlock>
       </PreviewSection>
 
-      <PreviewSection title="Python">
-        <CodeBlock code={pythonCode} language="python" />
+      <PreviewSection title="Python" description="Without line numbers">
+        <CodeBlock code={pythonCode} language="python">
+          <CodeBlockHeader>
+            <CodeBlockTitle>python</CodeBlockTitle>
+            <CodeBlockCopyButton />
+          </CodeBlockHeader>
+          <CodeBlockContent code={pythonCode} />
+        </CodeBlock>
       </PreviewSection>
     </View>
   );

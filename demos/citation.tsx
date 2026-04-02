@@ -1,45 +1,113 @@
-import { InlineCitation, Sources } from '@/components/ai';
-import type { Source } from '@/components/ai';
+import {
+  InlineCitation,
+  InlineCitationCard,
+  Sources,
+  SourcesContent,
+  Source,
+} from '@/components/ai';
+import type { SourceData } from '@/components/ai';
 import { PreviewSection } from '@/components/showcase/preview';
 import { Text } from '@/components/ui/text';
-import { View } from 'react-native';
+import * as React from 'react';
+import { Alert, View } from 'react-native';
 
-const sources: Source[] = [
+const nlpSources: SourceData[] = [
   {
-    title: 'Attention Is All You Need',
-    url: 'https://arxiv.org/abs/1706.03762',
-    snippet: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms.',
+    title: 'Advances in Natural Language Processing',
+    url: 'https://example.com/nlp-advances',
+    description:
+      'A comprehensive study on the recent developments in natural language processing technologies and their applications.',
   },
   {
-    title: 'BERT: Pre-training of Deep Bidirectional Transformers',
-    url: 'https://arxiv.org/abs/1810.04805',
-    snippet: 'We introduce BERT, designed to pre-train deep bidirectional representations from unlabeled text.',
+    title: 'Breakthroughs in Machine Learning',
+    url: 'https://mlnews.org/breakthroughs',
+    description:
+      'An overview of the most significant machine learning breakthroughs in the past year.',
   },
   {
-    title: 'Language Models are Few-Shot Learners',
-    url: 'https://arxiv.org/abs/2005.14165',
-    snippet: 'We demonstrate that scaling up language models greatly improves task-agnostic, few-shot performance.',
+    title: 'AI in Healthcare: Current Trends',
+    url: 'https://healthai.com/trends',
+    description:
+      'A report on how artificial intelligence is transforming healthcare and diagnostics.',
   },
 ];
 
+const ethicsSources: SourceData[] = [
+  {
+    title: 'Ethics of Artificial Intelligence',
+    url: 'https://aiethics.org/overview',
+    description:
+      'A discussion on the ethical considerations and challenges in the development of AI.',
+  },
+  {
+    title: 'Scaling Deep Learning Models',
+    url: 'https://deeplearninghub.com/scaling-models',
+    description:
+      'Insights into the technical challenges and solutions for scaling deep learning architectures.',
+  },
+];
+
+const allSources: SourceData[] = [
+  { title: 'Stripe API Documentation', url: 'https://stripe.com/docs/api' },
+  { title: 'GitHub REST API', url: 'https://docs.github.com/en/rest' },
+  { title: 'AWS SDK for JavaScript', url: 'https://docs.aws.amazon.com/sdk-for-javascript/' },
+];
+
 export function CitationDemo() {
+  const [cardVisible, setCardVisible] = React.useState<string | null>(null);
+
+  const toggleCard = React.useCallback((key: string) => {
+    setCardVisible((prev) => (prev === key ? null : key));
+  }, []);
+
   return (
     <View className="gap-6">
-      <PreviewSection title="Inline citations" description="Clickable reference markers">
-        <View className="flex-row flex-wrap items-center gap-1">
-          <Text className="text-foreground text-sm">
-            Transformers revolutionized NLP
-          </Text>
-          <InlineCitation index={1} source={sources[0]} />
-          <Text className="text-foreground text-sm">
-            and BERT showed the power of pre-training
-          </Text>
-          <InlineCitation index={2} source={sources[1]} />
+      <PreviewSection title="Inline citations" description="Tappable badges that reveal source details">
+        <View className="gap-3">
+          <View className="flex-row flex-wrap items-center">
+            <Text className="text-sm leading-relaxed">
+              According to recent studies, artificial intelligence has shown remarkable progress in
+              natural language processing.{' '}
+            </Text>
+            <InlineCitation
+              sources={nlpSources}
+              onPress={() => toggleCard('nlp')}
+            />
+          </View>
+
+          {cardVisible === 'nlp' ? (
+            <InlineCitationCard sources={nlpSources} />
+          ) : null}
+
+          <View className="flex-row flex-wrap items-center">
+            <Text className="text-sm leading-relaxed">
+              The ethical implications of AI development continue to be debated across the industry.{' '}
+            </Text>
+            <InlineCitation
+              sources={ethicsSources}
+              onPress={() => toggleCard('ethics')}
+            />
+          </View>
+
+          {cardVisible === 'ethics' ? (
+            <InlineCitationCard sources={ethicsSources} />
+          ) : null}
         </View>
       </PreviewSection>
 
-      <PreviewSection title="Sources list" description="Full source references">
-        <Sources sources={sources} />
+      <PreviewSection title="Sources panel" description="Collapsible list of referenced sources">
+        <Sources count={allSources.length} defaultOpen>
+          <SourcesContent>
+            {allSources.map((source) => (
+              <Source
+                key={source.url}
+                title={source.title}
+                url={source.url}
+                onPress={() => Alert.alert('Source tapped', source.title)}
+              />
+            ))}
+          </SourcesContent>
+        </Sources>
       </PreviewSection>
     </View>
   );

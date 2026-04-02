@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
+import { Text } from '@/components/ui/text';
 import * as React from 'react';
-import { View } from 'react-native';
+import { View, type ViewProps } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -8,11 +9,9 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import { Text } from '@/components/ui/text';
 
-type ShimmerProps = {
+type ShimmerProps = ViewProps & {
   children?: string;
-  className?: string;
   duration?: number;
 };
 
@@ -20,6 +19,7 @@ const Shimmer = React.memo(function Shimmer({
   children = 'Thinking...',
   className,
   duration = 1.5,
+  ...props
 }: ShimmerProps) {
   const opacity = useSharedValue(0.3);
 
@@ -36,7 +36,7 @@ const Shimmer = React.memo(function Shimmer({
   }));
 
   return (
-    <View className={cn('flex-row items-center', className)}>
+    <View className={cn('flex-row items-center', className)} {...props}>
       <Animated.View style={animatedStyle}>
         <Text className="text-muted-foreground text-sm">{children}</Text>
       </Animated.View>

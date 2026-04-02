@@ -1,94 +1,140 @@
 import { cn } from '@/lib/utils';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import {
-  BanIcon,
-  CheckCircleIcon,
-  CircleIcon,
-  LoaderIcon,
-  XCircleIcon,
-} from 'lucide-react-native';
+import * as Collapsible from '@rn-primitives/collapsible';
+import { ChevronDownIcon, SearchIcon } from 'lucide-react-native';
 import * as React from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
-// --- Types ---
+// --- TaskItemFile ---
 
-type TaskStatus = 'queued' | 'running' | 'completed' | 'failed' | 'cancelled';
-
-type TaskProps = {
-  title: string;
-  description?: string;
-  status: TaskStatus;
+type TaskItemFileProps = {
+  children?: React.ReactNode;
   className?: string;
 };
 
-// --- TaskStatusIcon ---
-
-function TaskStatusIcon({ status }: { status: TaskStatus }) {
-  switch (status) {
-    case 'queued':
-      return <Icon as={CircleIcon} className="text-muted-foreground size-4" />;
-    case 'running':
-      return <Icon as={LoaderIcon} className="size-4 text-blue-500" />;
-    case 'completed':
-      return <Icon as={CheckCircleIcon} className="size-4 text-green-500" />;
-    case 'failed':
-      return <Icon as={XCircleIcon} className="size-4 text-red-500" />;
-    case 'cancelled':
-      return <Icon as={BanIcon} className="text-muted-foreground size-4" />;
-  }
-}
-
-// --- Status label ---
-
-const STATUS_LABELS: Record<TaskStatus, string> = {
-  queued: 'Queued',
-  running: 'Running',
-  completed: 'Completed',
-  failed: 'Failed',
-  cancelled: 'Cancelled',
-};
-
-// --- Task ---
-
-const Task = React.memo(function Task({
-  title,
-  description,
-  status,
+const TaskItemFile = React.memo(function TaskItemFile({
+  children,
   className,
-}: TaskProps) {
+}: TaskItemFileProps) {
   return (
     <View
       className={cn(
-        'bg-secondary/50 border-border rounded-lg border px-3 py-2.5',
-        status === 'failed' && 'border-red-500/20',
+        'bg-secondary border-border flex-row items-center gap-1 rounded-md border px-1.5 py-0.5',
         className
       )}
     >
-      <View className="flex-row items-center gap-2">
-        <TaskStatusIcon status={status} />
-        <Text className="text-foreground flex-1 text-sm font-medium">{title}</Text>
-        <Text
-          className={cn(
-            'text-xs',
-            status === 'running' && 'text-blue-500',
-            status === 'completed' && 'text-green-500',
-            status === 'failed' && 'text-red-500',
-            status === 'cancelled' && 'text-muted-foreground',
-            status === 'queued' && 'text-muted-foreground'
-          )}
-        >
-          {STATUS_LABELS[status]}
-        </Text>
-      </View>
-      {description && (
-        <Text className="text-muted-foreground mt-1 pl-6 text-xs">{description}</Text>
+      {typeof children === 'string' ? (
+        <Text className="text-foreground text-xs">{children}</Text>
+      ) : (
+        children
       )}
     </View>
   );
 });
 
+TaskItemFile.displayName = 'TaskItemFile';
+
+// --- TaskItem ---
+
+type TaskItemProps = {
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const TaskItem = React.memo(function TaskItem({ children, className }: TaskItemProps) {
+  return (
+    <View className={cn('flex-row items-center', className)}>
+      {typeof children === 'string' ? (
+        <Text className="text-muted-foreground text-sm">{children}</Text>
+      ) : (
+        children
+      )}
+    </View>
+  );
+});
+
+TaskItem.displayName = 'TaskItem';
+
+// --- Task (root with collapsible) ---
+
+type TaskProps = {
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const Task = React.memo(function Task({
+  defaultOpen = true,
+  open,
+  onOpenChange,
+  children,
+  className,
+}: TaskProps) {
+  return (
+    <Collapsible.Root
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      className={cn(className)}
+    >
+      {children}
+    </Collapsible.Root>
+  );
+});
+
 Task.displayName = 'Task';
 
-export { Task };
-export type { TaskProps, TaskStatus };
+// --- TaskTrigger ---
+
+type TaskTriggerProps = {
+  title: string;
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const TaskTrigger = React.memo(function TaskTrigger({
+  title,
+  children,
+  className,
+}: TaskTriggerProps) {
+  return (
+    <Collapsible.Trigger asChild>
+      <Pressable className={cn('flex-row items-center gap-2', className)}>
+        {children ?? (
+          <>
+            <Icon as={SearchIcon} className="text-muted-foreground size-4" />
+            <Text className="text-muted-foreground flex-1 text-sm">{title}</Text>
+            <Icon as={ChevronDownIcon} className="text-muted-foreground size-4" />
+          </>
+        )}
+      </Pressable>
+    </Collapsible.Trigger>
+  );
+});
+
+TaskTrigger.displayName = 'TaskTrigger';
+
+// --- TaskContent ---
+
+type TaskContentProps = {
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const TaskContent = React.memo(function TaskContent({ children, className }: TaskContentProps) {
+  return (
+    <Collapsible.Content>
+      <View className={cn('border-muted mt-4 gap-2 border-l-2 pl-4', className)}>
+        {children}
+      </View>
+    </Collapsible.Content>
+  );
+});
+
+TaskContent.displayName = 'TaskContent';
+
+export { Task, TaskTrigger, TaskContent, TaskItem, TaskItemFile };
+export type { TaskProps, TaskTriggerProps, TaskContentProps, TaskItemProps, TaskItemFileProps };

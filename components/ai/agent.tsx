@@ -1,140 +1,199 @@
 import { cn } from '@/lib/utils';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import {
-  BotIcon,
-  CheckCircleIcon,
-  CircleAlertIcon,
-  CircleIcon,
-  ClockIcon,
-} from 'lucide-react-native';
+import * as Collapsible from '@rn-primitives/collapsible';
+import { BotIcon, ChevronDownIcon } from 'lucide-react-native';
 import * as React from 'react';
-import { View } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
+import { Pressable, View } from 'react-native';
 
-// --- Types ---
-
-type AgentStatus = 'idle' | 'thinking' | 'acting' | 'waiting' | 'complete' | 'error';
+// --- Agent (container) ---
 
 type AgentProps = {
-  name: string;
-  status: AgentStatus;
-  action?: string;
+  children?: React.ReactNode;
   className?: string;
 };
 
-// --- Animated indicator for active states ---
-
-const PulseIndicator = React.memo(function PulseIndicator({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const opacity = useSharedValue(0.4);
-
-  React.useEffect(() => {
-    opacity.value = withRepeat(
-      withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      true
-    );
-  }, [opacity]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
-
-  return <Animated.View style={animatedStyle}>{children}</Animated.View>;
-});
-
-PulseIndicator.displayName = 'PulseIndicator';
-
-// --- StatusIndicator ---
-
-const STATUS_LABELS: Record<AgentStatus, string> = {
-  idle: 'Idle',
-  thinking: 'Thinking',
-  acting: 'Acting',
-  waiting: 'Waiting',
-  complete: 'Complete',
-  error: 'Error',
-};
-
-const ACTIVE_STATUSES: Set<AgentStatus> = new Set(['thinking', 'acting', 'waiting']);
-
-function StatusIndicator({ status }: { status: AgentStatus }) {
-  const iconElement = (() => {
-    switch (status) {
-      case 'idle':
-        return <Icon as={CircleIcon} className="text-muted-foreground size-3" />;
-      case 'thinking':
-        return <Icon as={BotIcon} className="size-3 text-blue-500" />;
-      case 'acting':
-        return <Icon as={BotIcon} className="size-3 text-purple-500" />;
-      case 'waiting':
-        return <Icon as={ClockIcon} className="size-3 text-yellow-500" />;
-      case 'complete':
-        return <Icon as={CheckCircleIcon} className="size-3 text-green-500" />;
-      case 'error':
-        return <Icon as={CircleAlertIcon} className="size-3 text-red-500" />;
-    }
-  })();
-
-  if (ACTIVE_STATUSES.has(status)) {
-    return <PulseIndicator>{iconElement}</PulseIndicator>;
-  }
-
-  return iconElement;
-}
-
-// --- Agent ---
-
-const Agent = React.memo(function Agent({
-  name,
-  status,
-  action,
-  className,
-}: AgentProps) {
+const Agent = React.memo(function Agent({ children, className }: AgentProps) {
   return (
-    <View
-      className={cn(
-        'bg-secondary/50 border-border flex-row items-center gap-3 rounded-lg border px-3 py-2.5',
-        status === 'error' && 'border-red-500/20',
-        className
-      )}
-    >
-      <StatusIndicator status={status} />
-      <View className="flex-1 gap-0.5">
-        <Text className="text-foreground text-sm font-medium">{name}</Text>
-        {action ? (
-          <Text className="text-muted-foreground text-xs">{action}</Text>
-        ) : (
-          <Text
-            className={cn(
-              'text-xs',
-              status === 'thinking' && 'text-blue-500',
-              status === 'acting' && 'text-purple-500',
-              status === 'waiting' && 'text-yellow-500',
-              status === 'complete' && 'text-green-500',
-              status === 'error' && 'text-red-500',
-              status === 'idle' && 'text-muted-foreground'
-            )}
-          >
-            {STATUS_LABELS[status]}
-          </Text>
-        )}
-      </View>
+    <View className={cn('border-border rounded-md border', className)}>
+      {children}
     </View>
   );
 });
 
 Agent.displayName = 'Agent';
 
-export { Agent };
-export type { AgentProps, AgentStatus };
+// --- AgentHeader ---
+
+type AgentHeaderProps = {
+  name: string;
+  model?: string;
+  className?: string;
+};
+
+const AgentHeader = React.memo(function AgentHeader({
+  name,
+  model,
+  className,
+}: AgentHeaderProps) {
+  return (
+    <View className={cn('flex-row items-center justify-between gap-4 p-3', className)}>
+      <View className="flex-row items-center gap-2">
+        <Icon as={BotIcon} className="text-muted-foreground size-4" />
+        <Text className="text-foreground text-sm font-medium">{name}</Text>
+        {model ? (
+          <View className="bg-secondary rounded-full px-2 py-0.5">
+            <Text className="text-secondary-foreground font-mono text-xs">{model}</Text>
+          </View>
+        ) : null}
+      </View>
+    </View>
+  );
+});
+
+AgentHeader.displayName = 'AgentHeader';
+
+// --- AgentContent ---
+
+type AgentContentProps = {
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const AgentContent = React.memo(function AgentContent({
+  children,
+  className,
+}: AgentContentProps) {
+  return <View className={cn('gap-4 p-4 pt-0', className)}>{children}</View>;
+});
+
+AgentContent.displayName = 'AgentContent';
+
+// --- AgentInstructions ---
+
+type AgentInstructionsProps = {
+  children: string;
+  className?: string;
+};
+
+const AgentInstructions = React.memo(function AgentInstructions({
+  children,
+  className,
+}: AgentInstructionsProps) {
+  return (
+    <View className={cn('gap-2', className)}>
+      <Text className="text-muted-foreground text-sm font-medium">Instructions</Text>
+      <View className="bg-muted/50 rounded-md p-3">
+        <Text className="text-muted-foreground text-sm">{children}</Text>
+      </View>
+    </View>
+  );
+});
+
+AgentInstructions.displayName = 'AgentInstructions';
+
+// --- AgentTools (accordion-like container) ---
+
+type AgentToolsProps = {
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const AgentTools = React.memo(function AgentTools({
+  children,
+  className,
+}: AgentToolsProps) {
+  return (
+    <View className={cn('gap-2', className)}>
+      <Text className="text-muted-foreground text-sm font-medium">Tools</Text>
+      <View className="border-border rounded-md border">{children}</View>
+    </View>
+  );
+});
+
+AgentTools.displayName = 'AgentTools';
+
+// --- AgentTool (individual tool with collapsible schema) ---
+
+type AgentToolSchema = {
+  description?: string;
+  inputSchema?: Record<string, unknown>;
+  jsonSchema?: Record<string, unknown>;
+};
+
+type AgentToolProps = {
+  tool: AgentToolSchema;
+  className?: string;
+};
+
+const AgentTool = React.memo(function AgentTool({ tool, className }: AgentToolProps) {
+  const schema =
+    tool.jsonSchema ?? tool.inputSchema;
+
+  return (
+    <Collapsible.Root className={cn('border-border border-b last:border-b-0', className)}>
+      <Collapsible.Trigger asChild>
+        <Pressable className="flex-row items-center justify-between px-3 py-2">
+          <Text className="text-foreground flex-1 text-sm">
+            {tool.description ?? 'No description'}
+          </Text>
+          <Icon as={ChevronDownIcon} className="text-muted-foreground size-4" />
+        </Pressable>
+      </Collapsible.Trigger>
+      <Collapsible.Content>
+        <View className="px-3 pb-3">
+          <View className="bg-muted/50 rounded-md p-3">
+            <Text className="text-muted-foreground font-mono text-xs">
+              {schema ? JSON.stringify(schema, null, 2) : 'No schema available'}
+            </Text>
+          </View>
+        </View>
+      </Collapsible.Content>
+    </Collapsible.Root>
+  );
+});
+
+AgentTool.displayName = 'AgentTool';
+
+// --- AgentOutput ---
+
+type AgentOutputProps = {
+  schema: string;
+  className?: string;
+};
+
+const AgentOutput = React.memo(function AgentOutput({
+  schema,
+  className,
+}: AgentOutputProps) {
+  return (
+    <View className={cn('gap-2', className)}>
+      <Text className="text-muted-foreground text-sm font-medium">Output Schema</Text>
+      <View className="bg-muted/50 rounded-md p-3">
+        <Text className="text-foreground font-mono text-xs">{schema}</Text>
+      </View>
+    </View>
+  );
+});
+
+AgentOutput.displayName = 'AgentOutput';
+
+export {
+  Agent,
+  AgentHeader,
+  AgentContent,
+  AgentInstructions,
+  AgentTools,
+  AgentTool,
+  AgentOutput,
+};
+export type {
+  AgentProps,
+  AgentHeaderProps,
+  AgentContentProps,
+  AgentInstructionsProps,
+  AgentToolsProps,
+  AgentToolProps,
+  AgentToolSchema,
+  AgentOutputProps,
+};

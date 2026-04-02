@@ -1,130 +1,159 @@
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button, type ButtonProps } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import * as Tabs from '@rn-primitives/tabs';
-import * as React from 'react';
-import { View } from 'react-native';
-import { Code, FileText, Image, Globe, Copy } from 'lucide-react-native';
+import { XIcon } from 'lucide-react-native';
 import type { LucideIcon } from 'lucide-react-native';
+import * as React from 'react';
+import { View, type ViewProps } from 'react-native';
 
-const TYPE_ICONS: Record<string, LucideIcon> = {
-  code: Code,
-  text: FileText,
-  image: Image,
-  web: Globe,
-};
+// --- Artifact (container) ---
 
-type ArtifactType = 'code' | 'text' | 'image' | 'web';
+type ArtifactProps = ViewProps;
 
-type ArtifactProps = {
-  title: string;
-  type?: ArtifactType;
-  children: React.ReactNode;
-  onCopy?: () => void;
-  className?: string;
-};
-
-function Artifact({ title, type = 'text', children, onCopy, className }: ArtifactProps) {
-  const TypeIcon = TYPE_ICONS[type] ?? FileText;
-
+function Artifact({ className, ...props }: ArtifactProps) {
   return (
     <View
-      className={cn('bg-card border-border overflow-hidden rounded-xl border', className)}
-    >
-      {/* Header */}
-      <View className="border-border flex-row items-center justify-between border-b px-4 py-3">
-        <View className="flex-row items-center gap-2">
-          <Icon as={TypeIcon} className="text-muted-foreground size-4" />
-          <Text className="text-sm font-medium">{title}</Text>
-        </View>
-        {/* Action bar */}
-        <View className="flex-row items-center gap-1">
-          <Button variant="ghost" size="icon" onPress={onCopy} className="h-8 w-8">
-            <Icon as={Copy} className="text-muted-foreground size-4" />
-          </Button>
-        </View>
-      </View>
-
-      {/* Content */}
-      <View className="p-4">{children}</View>
-    </View>
+      className={cn(
+        'bg-background border-border overflow-hidden rounded-lg border shadow-sm',
+        className
+      )}
+      {...props}
+    />
   );
 }
 
-// --- ArtifactTabs: tabbed artifact container ---
+// --- ArtifactHeader ---
 
-type ArtifactTab = {
-  value: string;
-  label: string;
-  children: React.ReactNode;
-};
+type ArtifactHeaderProps = ViewProps;
 
-type ArtifactTabsProps = {
-  title: string;
-  type?: ArtifactType;
-  tabs: ArtifactTab[];
-  defaultTab?: string;
-  onCopy?: () => void;
-  className?: string;
-};
-
-function ArtifactTabs({ title, type = 'text', tabs, defaultTab, onCopy, className }: ArtifactTabsProps) {
-  const TypeIcon = TYPE_ICONS[type] ?? FileText;
-  const [activeTab, setActiveTab] = React.useState(defaultTab ?? tabs[0]?.value ?? '');
-
+function ArtifactHeader({ className, ...props }: ArtifactHeaderProps) {
   return (
-    <Tabs.Root value={activeTab} onValueChange={setActiveTab}>
-      <View
-        className={cn('bg-card border-border overflow-hidden rounded-xl border', className)}
-      >
-        {/* Header */}
-        <View className="border-border flex-row items-center justify-between border-b px-4 py-3">
-          <View className="flex-row items-center gap-2">
-            <Icon as={TypeIcon} className="text-muted-foreground size-4" />
-            <Text className="text-sm font-medium">{title}</Text>
-          </View>
-          <Button variant="ghost" size="icon" onPress={onCopy} className="h-8 w-8">
-            <Icon as={Copy} className="text-muted-foreground size-4" />
-          </Button>
-        </View>
-
-        {/* Tab List */}
-        <Tabs.List className="border-border flex-row border-b px-2">
-          {tabs.map((tab) => (
-            <Tabs.Trigger
-              key={tab.value}
-              value={tab.value}
-              className={cn(
-                'px-3 py-2',
-                activeTab === tab.value && 'border-primary border-b-2'
-              )}
-            >
-              <Text
-                className={cn(
-                  'text-muted-foreground text-sm',
-                  activeTab === tab.value && 'text-foreground font-medium'
-                )}
-              >
-                {tab.label}
-              </Text>
-            </Tabs.Trigger>
-          ))}
-        </Tabs.List>
-
-        {/* Tab Content */}
-        {tabs.map((tab) => (
-          <Tabs.Content key={tab.value} value={tab.value} className="p-4">
-            {tab.children}
-          </Tabs.Content>
-        ))}
-      </View>
-    </Tabs.Root>
+    <View
+      className={cn(
+        'bg-muted/50 border-border flex-row items-center justify-between border-b px-4 py-3',
+        className
+      )}
+      {...props}
+    />
   );
+}
+
+// --- ArtifactClose ---
+
+type ArtifactCloseProps = ButtonProps;
+
+function ArtifactClose({
+  className,
+  children,
+  size = 'icon',
+  variant = 'ghost',
+  ...props
+}: ArtifactCloseProps) {
+  return (
+    <Button
+      className={cn('h-8 w-8 p-0', className)}
+      size={size}
+      variant={variant}
+      accessibilityLabel="Close"
+      {...props}
+    >
+      {children ?? <Icon as={XIcon} className="text-muted-foreground size-4" />}
+    </Button>
+  );
+}
+
+// --- ArtifactTitle ---
+
+type ArtifactTitleProps = React.ComponentProps<typeof Text>;
+
+function ArtifactTitle({ className, ...props }: ArtifactTitleProps) {
+  return <Text className={cn('text-foreground text-sm font-medium', className)} {...props} />;
+}
+
+// --- ArtifactDescription ---
+
+type ArtifactDescriptionProps = React.ComponentProps<typeof Text>;
+
+function ArtifactDescription({ className, ...props }: ArtifactDescriptionProps) {
+  return <Text className={cn('text-muted-foreground text-sm', className)} {...props} />;
+}
+
+// --- ArtifactActions ---
+
+type ArtifactActionsProps = ViewProps;
+
+function ArtifactActions({ className, ...props }: ArtifactActionsProps) {
+  return <View className={cn('flex-row items-center gap-1', className)} {...props} />;
+}
+
+// --- ArtifactAction ---
+
+type ArtifactActionProps = ButtonProps & {
+  label?: string;
+  icon?: LucideIcon;
+};
+
+function ArtifactAction({
+  label,
+  icon: IconComponent,
+  children,
+  className,
+  size = 'icon',
+  variant = 'ghost',
+  ...props
+}: ArtifactActionProps) {
+  return (
+    <Button
+      className={cn('h-8 w-8 p-0', className)}
+      size={size}
+      variant={variant}
+      accessibilityLabel={label}
+      {...props}
+    >
+      {IconComponent ? (
+        <Icon as={IconComponent} className="text-muted-foreground size-4" />
+      ) : (
+        children
+      )}
+    </Button>
+  );
+}
+
+// --- ArtifactContent ---
+
+type ArtifactContentProps = ViewProps;
+
+function ArtifactContent({ className, ...props }: ArtifactContentProps) {
+  return <View className={cn('flex-1 overflow-hidden p-4', className)} {...props} />;
 }
 
 Artifact.displayName = 'Artifact';
-ArtifactTabs.displayName = 'ArtifactTabs';
+ArtifactHeader.displayName = 'ArtifactHeader';
+ArtifactClose.displayName = 'ArtifactClose';
+ArtifactTitle.displayName = 'ArtifactTitle';
+ArtifactDescription.displayName = 'ArtifactDescription';
+ArtifactActions.displayName = 'ArtifactActions';
+ArtifactAction.displayName = 'ArtifactAction';
+ArtifactContent.displayName = 'ArtifactContent';
 
-export { Artifact, ArtifactTabs };
-export type { ArtifactProps, ArtifactTabsProps, ArtifactTab, ArtifactType };
+export {
+  Artifact,
+  ArtifactHeader,
+  ArtifactClose,
+  ArtifactTitle,
+  ArtifactDescription,
+  ArtifactActions,
+  ArtifactAction,
+  ArtifactContent,
+};
+export type {
+  ArtifactProps,
+  ArtifactHeaderProps,
+  ArtifactCloseProps,
+  ArtifactTitleProps,
+  ArtifactDescriptionProps,
+  ArtifactActionsProps,
+  ArtifactActionProps,
+  ArtifactContentProps,
+};
