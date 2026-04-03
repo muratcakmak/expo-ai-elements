@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { MONO_STYLE } from '@/lib/fonts';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import {
@@ -493,7 +494,7 @@ const TestErrorStack = React.memo(function TestErrorStack({
   className,
 }: TestErrorStackProps) {
   return (
-    <Text className={cn('mt-2 font-mono text-xs text-red-600 dark:text-red-400', className)}>
+    <Text style={MONO_STYLE} className={cn('mt-2 text-xs text-red-600 dark:text-red-400', className)}>
       {children}
     </Text>
   );

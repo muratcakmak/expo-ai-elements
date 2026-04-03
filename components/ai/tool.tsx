@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { MONO_STYLE } from '@/lib/fonts';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { Shimmer } from '@/components/ai/shimmer';
@@ -221,7 +222,7 @@ const ToolInput = React.memo(function ToolInput({ input, className }: ToolInputP
         Parameters
       </Text>
       <View className="bg-muted/50 rounded-md p-3">
-        <Text className="text-muted-foreground font-mono text-xs">
+        <Text style={MONO_STYLE} className="text-muted-foreground text-xs">
           {JSON.stringify(input, null, 2)}
         </Text>
       </View>
@@ -259,9 +260,9 @@ const ToolOutput = React.memo(function ToolOutput({ output, errorText, className
         )}
       >
         {errorText ? (
-          <Text className="text-destructive font-mono text-xs">{errorText}</Text>
+          <Text style={MONO_STYLE} className="text-destructive text-xs">{errorText}</Text>
         ) : (
-          <Text className="text-foreground font-mono text-xs">{displayText}</Text>
+          <Text style={MONO_STYLE} className="text-foreground text-xs">{displayText}</Text>
         )}
       </View>
     </View>

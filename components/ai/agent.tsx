@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { MONO_STYLE } from '@/lib/fonts';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import * as Collapsible from '@rn-primitives/collapsible';
@@ -43,7 +44,7 @@ const AgentHeader = React.memo(function AgentHeader({
         <Text className="text-foreground text-sm font-medium">{name}</Text>
         {model ? (
           <View className="bg-secondary rounded-full px-2 py-0.5">
-            <Text className="text-secondary-foreground font-mono text-xs">{model}</Text>
+            <Text style={MONO_STYLE} className="text-secondary-foreground text-xs">{model}</Text>
           </View>
         ) : null}
       </View>
@@ -143,7 +144,7 @@ const AgentTool = React.memo(function AgentTool({ tool, className }: AgentToolPr
       <Collapsible.Content>
         <View className="px-3 pb-3">
           <View className="bg-muted/50 rounded-md p-3">
-            <Text className="text-muted-foreground font-mono text-xs">
+            <Text style={MONO_STYLE} className="text-muted-foreground text-xs">
               {schema ? JSON.stringify(schema, null, 2) : 'No schema available'}
             </Text>
           </View>
@@ -170,7 +171,7 @@ const AgentOutput = React.memo(function AgentOutput({
     <View className={cn('gap-2', className)}>
       <Text className="text-muted-foreground text-sm font-medium">Output Schema</Text>
       <View className="bg-muted/50 rounded-md p-3">
-        <Text className="text-foreground font-mono text-xs">{schema}</Text>
+        <Text style={MONO_STYLE} className="text-foreground text-xs">{schema}</Text>
       </View>
     </View>
   );

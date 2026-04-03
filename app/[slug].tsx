@@ -1,5 +1,6 @@
 import { Preview } from '@/components/showcase/preview';
 import { getComponent } from '@/lib/component-registry';
+import { MONO_STYLE } from '@/lib/fonts';
 import { Text } from '@/components/ui/text';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import * as React from 'react';
@@ -80,7 +81,7 @@ class DemoErrorBoundary extends React.Component<
           <Text className="text-destructive font-semibold">
             {this.props.name} crashed:
           </Text>
-          <Text className="text-destructive mt-1 font-mono text-xs">
+          <Text style={MONO_STYLE} className="text-destructive mt-1 text-xs">
             {this.state.error.message}
           </Text>
         </View>

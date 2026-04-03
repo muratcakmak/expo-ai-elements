@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { MONO_STYLE } from '@/lib/fonts';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { ChevronRightIcon } from 'lucide-react-native';
@@ -143,7 +144,7 @@ const SchemaDisplayMethod = React.memo(function SchemaDisplayMethod({
 
   return (
     <View className={cn('rounded-md px-2 py-0.5', style.bg, className)}>
-      <Text className={cn('font-mono text-xs font-semibold', style.text)}>
+      <Text style={MONO_STYLE} className={cn('text-xs font-semibold', style.text)}>
         {children ?? method}
       </Text>
     </View>
@@ -166,7 +167,7 @@ const SchemaDisplayPath = React.memo(function SchemaDisplayPath({
   const { path } = React.useContext(SchemaDisplayContext);
 
   return (
-    <Text className={cn('font-mono text-sm', className)}>{children ?? path}</Text>
+    <Text style={MONO_STYLE} className={cn('text-sm', className)}>{children ?? path}</Text>
   );
 });
 
@@ -227,7 +228,7 @@ const SchemaDisplayParameter = React.memo(function SchemaDisplayParameter({
   return (
     <View className={cn('px-4 py-3 pl-10', className)}>
       <View className="flex-row flex-wrap items-center gap-2">
-        <Text className="font-mono text-sm">{name}</Text>
+        <Text style={MONO_STYLE} className="text-sm">{name}</Text>
         <View className="rounded-md border border-border px-1.5 py-0.5">
           <Text className="text-xs">{type}</Text>
         </View>
@@ -318,7 +319,7 @@ const SchemaDisplayProperty = React.memo(function SchemaDisplayProperty({
             style={{ paddingLeft }}
           >
             <Icon as={ChevronRightIcon} className="size-4 shrink-0 text-muted-foreground" />
-            <Text className="font-mono text-sm">{name}</Text>
+            <Text style={MONO_STYLE} className="text-sm">{name}</Text>
             <View className="rounded-md border border-border px-1.5 py-0.5">
               <Text className="text-xs">{type}</Text>
             </View>
@@ -355,7 +356,7 @@ const SchemaDisplayProperty = React.memo(function SchemaDisplayProperty({
     <View className={cn('py-3 pr-4', className)} style={{ paddingLeft }}>
       <View className="flex-row flex-wrap items-center gap-2">
         <View className="w-4" />
-        <Text className="font-mono text-sm">{name}</Text>
+        <Text style={MONO_STYLE} className="text-sm">{name}</Text>
         <View className="rounded-md border border-border px-1.5 py-0.5">
           <Text className="text-xs">{type}</Text>
         </View>

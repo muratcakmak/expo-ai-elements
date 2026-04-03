@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { MONO_STYLE } from '@/lib/fonts';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
@@ -414,8 +415,9 @@ const StackTraceFrames = React.memo(function StackTraceFrames({
       {framesToShow.map((frame) => (
         <View key={frame.raw} className="flex-row flex-wrap">
           <Text
+            style={MONO_STYLE}
             className={cn(
-              'font-mono text-xs',
+              'text-xs',
               frame.isInternal ? 'text-muted-foreground/50' : 'text-muted-foreground'
             )}
           >
@@ -423,8 +425,9 @@ const StackTraceFrames = React.memo(function StackTraceFrames({
           </Text>
           {frame.functionName && (
             <Text
+              style={MONO_STYLE}
               className={cn(
-                'font-mono text-xs',
+                'text-xs',
                 frame.isInternal ? 'text-muted-foreground/50' : 'text-foreground'
               )}
             >
@@ -433,8 +436,9 @@ const StackTraceFrames = React.memo(function StackTraceFrames({
           )}
           {frame.filePath && (
             <Text
+              style={MONO_STYLE}
               className={cn(
-                'font-mono text-xs',
+                'text-xs',
                 frame.isInternal ? 'text-muted-foreground/50' : 'text-muted-foreground'
               )}
             >

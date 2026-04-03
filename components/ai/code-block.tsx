@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { MONO_STYLE } from '@/lib/fonts';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
@@ -100,7 +101,7 @@ const CodeBlockTitle = React.memo(function CodeBlockTitle({
   return (
     <View className={cn('flex-row items-center gap-2', className)}>
       {typeof children === 'string' ? (
-        <Text className="text-muted-foreground font-mono text-xs">{children}</Text>
+        <Text style={MONO_STYLE} className="text-muted-foreground text-xs">{children}</Text>
       ) : (
         children
       )}
@@ -190,7 +191,8 @@ const CodeBlockContent = React.memo(function CodeBlockContent({
             {lines.map((_, index) => (
               <Text
                 key={`ln-${index}`}
-                className="text-muted-foreground/50 font-mono text-xs leading-5"
+                style={MONO_STYLE}
+                className="text-muted-foreground/50 text-xs leading-5"
               >
                 {String(index + 1)}
               </Text>
@@ -199,7 +201,7 @@ const CodeBlockContent = React.memo(function CodeBlockContent({
         )}
         <View>
           {lines.map((line, index) => (
-            <Text key={`code-${index}`} className="text-foreground font-mono text-xs leading-5">
+            <Text key={`code-${index}`} style={MONO_STYLE} className="text-foreground text-xs leading-5">
               {line || ' '}
             </Text>
           ))}

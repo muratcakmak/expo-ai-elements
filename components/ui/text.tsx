@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { MONO_STYLE } from '@/lib/fonts';
 import * as Slot from '@rn-primitives/slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
@@ -27,9 +28,7 @@ const textVariants = cva(
         h4: cn('text-xl font-semibold tracking-tight', Platform.select({ web: 'scroll-m-20' })),
         p: 'mt-3 leading-7 sm:mt-6',
         blockquote: 'mt-4 border-l-2 pl-3 italic sm:mt-6 sm:pl-6',
-        code: cn(
-          'bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold'
-        ),
+        code: cn('bg-muted relative rounded px-[0.3rem] py-[0.2rem] text-sm font-semibold'),
         lead: 'text-muted-foreground text-xl',
         large: 'text-lg font-semibold',
         small: 'text-sm font-medium leading-none',
@@ -81,6 +80,7 @@ function Text({
       className={cn(textVariants({ variant }), textClass, className)}
       role={variant ? ROLE[variant] : undefined}
       aria-level={variant ? ARIA_LEVEL[variant] : undefined}
+      {...(variant === 'code' ? { style: [MONO_STYLE, props.style] } : {})}
       {...props}
     />
   );

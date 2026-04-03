@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { MONO_STYLE } from '@/lib/fonts';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
@@ -253,7 +254,7 @@ const TerminalContent = React.memo(function TerminalContent({
     >
       {children ?? (
         <View>
-          <Text className="font-mono text-sm leading-relaxed text-zinc-100">{output}</Text>
+          <Text style={MONO_STYLE} className="text-sm leading-relaxed text-zinc-100">{output}</Text>
           {isStreaming && (
             <View className="ml-0.5 mt-1 h-4 w-2 bg-zinc-100 opacity-50" />
           )}
