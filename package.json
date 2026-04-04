@@ -1,14 +1,20 @@
 {
   "name": "expo-ai-elements",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "scripts": {
     "dev": "expo start -c",
     "android": "expo start -c --android",
     "ios": "expo start -c --ios",
     "web": "expo start -c --web",
     "clean": "rm -rf .expo node_modules",
-    "postinstall": "node scripts/apply-patches.js"
+    "postinstall": "node scripts/apply-patches.js",
+    "prepare": "husky",
+    "release": "standard-version",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
+    "release:patch": "standard-version --release-as patch",
+    "release:dry": "standard-version --dry-run"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.144",
@@ -60,14 +66,14 @@
     "react-native-enriched-markdown": "^0.4.1",
     "react-native-gesture-handler": "~2.30.0",
     "react-native-keyboard-controller": "1.20.7",
-    "react-native-reanimated": "4.3.0",
+    "react-native-reanimated": "4.2.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.23.0",
     "react-native-streamdown": "^0.1.1",
     "react-native-svg": "15.15.3",
     "react-native-web": "^0.21.0",
     "react-native-webview": "13.16.0",
-    "react-native-worklets": "0.8.1",
+    "react-native-worklets": "0.7.2",
     "remend": "1.2.2",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.2.1",
@@ -77,11 +83,30 @@
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
     "@types/react": "~19.2.10",
+    "husky": "^9.1.7",
     "patch-package": "^8.0.1",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
+    "standard-version": "^9.5.0",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muratcakmak/expo-ai-elements.git"
+  },
+  "bugs": {
+    "url": "https://github.com/muratcakmak/expo-ai-elements/issues"
+  },
+  "homepage": "https://github.com/muratcakmak/expo-ai-elements#readme"
 }
