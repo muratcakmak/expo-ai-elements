@@ -57,21 +57,45 @@ For $2x^2 - 4x + 1 = 0$:
 
 $$x = \\frac{4 \\pm \\sqrt{16 - 8}}{4} = \\frac{4 \\pm 2\\sqrt{2}}{4} = 1 \\pm \\frac{\\sqrt{2}}{2}$$`,
 
-  default: `## Mathematics Overview
+  default: `## Advanced Mathematics
 
-The relationship between a function and its derivative:
+### Gaussian Integral
 
-$$\\frac{d}{dx}[f(g(x))] = f'(g(x)) \\cdot g'(x)$$
+One of the most remarkable results in analysis:
 
-This is the **chain rule**, one of the most fundamental rules in calculus.
+$$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$
 
-For example, if $f(x) = \\sin(x^2)$, then:
+### Matrix Transformation
 
-$$f'(x) = \\cos(x^2) \\cdot 2x$$
+A rotation matrix in $\\mathbb{R}^2$ by angle $\\theta$:
 
-The integral counterpart uses substitution:
+$$R(\\theta) = \\begin{pmatrix} \\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta \\end{pmatrix}$$
 
-$$\\int f(g(x)) \\cdot g'(x)\\,dx = F(g(x)) + C$$`,
+### Taylor Series
+
+The exponential function expanded around $x = 0$:
+
+$$e^x = \\sum_{n=0}^{\\infty} \\frac{x^n}{n!} = 1 + x + \\frac{x^2}{2!} + \\frac{x^3}{3!} + \\cdots$$
+
+### Nested Fractions & Continued Fractions
+
+The golden ratio $\\phi = \\frac{1 + \\sqrt{5}}{2}$ satisfies:
+
+$$\\phi = 1 + \\cfrac{1}{1 + \\cfrac{1}{1 + \\cfrac{1}{1 + \\cdots}}}$$
+
+### Bayes' Theorem
+
+For events $A$ and $B$ where $P(B) \\neq 0$:
+
+$$P(A|B) = \\frac{P(B|A) \\cdot P(A)}{P(B)} = \\frac{P(B|A) \\cdot P(A)}{\\sum_{i} P(B|A_i) \\cdot P(A_i)}$$
+
+### Schrödinger Equation
+
+The time-dependent form with Hamiltonian $\\hat{H}$:
+
+$$i\\hbar \\frac{\\partial}{\\partial t} |\\Psi(t)\\rangle = \\hat{H} |\\Psi(t)\\rangle$$
+
+Inline math mixed with text: The wave function $\\Psi(x,t) = Ae^{i(kx - \\omega t)}$ gives probability density $|\\Psi|^2$.`,
 };
 
 function getResponse(input: string): string {

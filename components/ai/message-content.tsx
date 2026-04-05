@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import { Shimmer } from '@/components/ai/shimmer';
 import * as React from 'react';
 import { View } from 'react-native';
-import { StreamdownText } from 'react-native-streamdown';
+import { EnrichedMarkdownText } from 'react-native-enriched-markdown';
 
 type MessageResponseProps = {
   children: string;
@@ -12,10 +12,24 @@ type MessageResponseProps = {
 
 const MessageResponse = React.memo(
   function MessageResponse({ children, isStreaming, className }: MessageResponseProps) {
+    // Throttle updates during streaming to reduce layout jumps.
+    // EnrichedMarkdownText recalculates native layout on every prop change.
+    // Buffering to ~80ms intervals cuts re-renders significantly.
+    const [displayText, setDisplayText] = React.useState(children);
+
+    React.useEffect(() => {
+      if (!isStreaming) {
+        setDisplayText(children);
+        return;
+      }
+      const timer = setTimeout(() => setDisplayText(children), 80);
+      return () => clearTimeout(timer);
+    }, [children, isStreaming]);
+
     return (
       <View className={cn('flex-1', className)} collapsable={false}>
-        {children.length > 0 ? (
-          <StreamdownText markdown={children} />
+        {displayText.length > 0 ? (
+          <EnrichedMarkdownText markdown={displayText} flavor="github" />
         ) : isStreaming ? (
           <Shimmer>Thinking...</Shimmer>
         ) : null}
