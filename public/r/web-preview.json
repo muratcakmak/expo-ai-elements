@@ -1,0 +1,30 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "web-preview",
+  "type": "registry:ui",
+  "title": "WebPreview",
+  "description": "WebView wrapper for previewing web content.",
+  "dependencies": [
+    "clsx",
+    "react-native-webview",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://reactnativereusables.com/r/uniwind/button.json",
+    "https://reactnativereusables.com/r/uniwind/text.json"
+  ],
+  "files": [
+    {
+      "path": "components/ai/web-preview.tsx",
+      "type": "registry:component",
+      "target": "components/ai/web-preview.tsx",
+      "content": "import { cn } from '@/lib/utils';\nimport { Button, type ButtonProps } from '@/components/ui/button';\nimport { Text } from '@/components/ui/text';\nimport * as React from 'react';\nimport { ActivityIndicator, TextInput, View, type ViewProps } from 'react-native';\nimport { WebView } from 'react-native-webview';\n\n// --- Context ---\n\ntype WebPreviewContextValue = {\n  url: string;\n  setUrl: (url: string) => void;\n};\n\nconst WebPreviewContext = React.createContext<WebPreviewContextValue | null>(null);\n\nfunction useWebPreview() {\n  const context = React.useContext(WebPreviewContext);\n  if (!context) {\n    throw new Error('WebPreview components must be used within a WebPreview');\n  }\n  return context;\n}\n\n// --- WebPreview (container) ---\n\ntype WebPreviewProps = ViewProps & {\n  defaultUrl?: string;\n  onUrlChange?: (url: string) => void;\n};\n\nfunction WebPreview({\n  className,\n  children,\n  defaultUrl = '',\n  onUrlChange,\n  ...props\n}: WebPreviewProps) {\n  const [url, setUrlState] = React.useState(defaultUrl);\n\n  const setUrl = React.useCallback(\n    (newUrl: string) => {\n      setUrlState(newUrl);\n      onUrlChange?.(newUrl);\n    },\n    [onUrlChange]\n  );\n\n  const contextValue = React.useMemo<WebPreviewContextValue>(\n    () => ({ url, setUrl }),\n    [url, setUrl]\n  );\n\n  return (\n    <WebPreviewContext.Provider value={contextValue}>\n      <View\n        className={cn('bg-card border-border overflow-hidden rounded-lg border', className)}\n        {...props}\n      >\n        {children}\n      </View>\n    </WebPreviewContext.Provider>\n  );\n}\n\n// --- WebPreviewNavigation ---\n\ntype WebPreviewNavigationProps = ViewProps;\n\nfunction WebPreviewNavigation({ className, children, ...props }: WebPreviewNavigationProps) {\n  return (\n    <View\n      className={cn('border-border flex-row items-center gap-1 border-b p-2', className)}\n      {...props}\n    >\n      {children}\n    </View>\n  );\n}\n\n// --- WebPreviewNavigationButton ---\n\ntype WebPreviewNavigationButtonProps = ButtonProps & {\n  label?: string;\n};\n\nfunction WebPreviewNavigationButton({\n  label,\n  children,\n  className,\n  ...props\n}: WebPreviewNavigationButtonProps) {\n  return (\n    <Button\n      className={cn('h-8 w-8 p-0', className)}\n      size=\"icon\"\n      variant=\"ghost\"\n      accessibilityLabel={label}\n      {...props}\n    >\n      {children}\n    </Button>\n  );\n}\n\n// --- WebPreviewUrl ---\n\ntype WebPreviewUrlProps = Omit<React.ComponentProps<typeof TextInput>, 'value' | 'onChangeText'> & {\n  className?: string;\n};\n\nfunction WebPreviewUrl({ className, ...props }: WebPreviewUrlProps) {\n  const { url, setUrl } = useWebPreview();\n  const [inputValue, setInputValue] = React.useState(url);\n  const prevUrlRef = React.useRef(url);\n\n  // Sync input value with context URL when it changes externally\n  if (url !== prevUrlRef.current) {\n    prevUrlRef.current = url;\n    setInputValue(url);\n  }\n\n  const handleSubmit = React.useCallback(() => {\n    setUrl(inputValue);\n  }, [inputValue, setUrl]);\n\n  return (\n    <TextInput\n      className={cn(\n        'bg-muted/50 border-border text-foreground h-8 flex-1 rounded-md border px-2 text-sm',\n        className\n      )}\n      value={inputValue}\n      onChangeText={setInputValue}\n      onSubmitEditing={handleSubmit}\n      placeholder=\"Enter URL...\"\n      placeholderTextColor=\"#9ca3af\"\n      autoCapitalize=\"none\"\n      autoCorrect={false}\n      keyboardType=\"url\"\n      returnKeyType=\"go\"\n      {...props}\n    />\n  );\n}\n\n// --- WebPreviewBody ---\n\ntype WebPreviewBodyProps = ViewProps & {\n  src?: string;\n  loading?: React.ReactNode;\n};\n\nfunction WebPreviewBody({ className, src, loading: loadingNode, ...props }: WebPreviewBodyProps) {\n  const { url } = useWebPreview();\n  const [isLoading, setIsLoading] = React.useState(true);\n  const resolvedUrl = src ?? url;\n\n  return (\n    <View className={cn('h-64 flex-1', className)} {...props}>\n      {resolvedUrl ? (\n        <WebView\n          source={{ uri: resolvedUrl }}\n          onLoadStart={() => setIsLoading(true)}\n          onLoadEnd={() => setIsLoading(false)}\n          style={{ flex: 1 }}\n        />\n      ) : null}\n      {isLoading && resolvedUrl\n        ? (loadingNode ?? (\n            <View className=\"absolute inset-0 items-center justify-center\">\n              <ActivityIndicator size=\"small\" />\n            </View>\n          ))\n        : null}\n    </View>\n  );\n}\n\nWebPreview.displayName = 'WebPreview';\nWebPreviewNavigation.displayName = 'WebPreviewNavigation';\nWebPreviewNavigationButton.displayName = 'WebPreviewNavigationButton';\nWebPreviewUrl.displayName = 'WebPreviewUrl';\nWebPreviewBody.displayName = 'WebPreviewBody';\n\nexport {\n  WebPreview,\n  WebPreviewNavigation,\n  WebPreviewNavigationButton,\n  WebPreviewUrl,\n  WebPreviewBody,\n  useWebPreview,\n};\nexport type {\n  WebPreviewProps,\n  WebPreviewNavigationProps,\n  WebPreviewNavigationButtonProps,\n  WebPreviewUrlProps,\n  WebPreviewBodyProps,\n  WebPreviewContextValue,\n};\n"
+    },
+    {
+      "path": "lib/utils.ts",
+      "type": "registry:lib",
+      "target": "lib/utils.ts",
+      "content": "import { clsx, type ClassValue } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n"
+    }
+  ]
+}

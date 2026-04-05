@@ -1,0 +1,29 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "suggestion",
+  "type": "registry:ui",
+  "title": "Suggestion",
+  "description": "Tappable suggestion chips in a horizontal scroll.",
+  "dependencies": [
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://reactnativereusables.com/r/uniwind/button.json",
+    "https://reactnativereusables.com/r/uniwind/text.json"
+  ],
+  "files": [
+    {
+      "path": "components/ai/suggestion.tsx",
+      "type": "registry:component",
+      "target": "components/ai/suggestion.tsx",
+      "content": "import { cn } from '@/lib/utils';\nimport { Button } from '@/components/ui/button';\nimport { Text } from '@/components/ui/text';\nimport * as React from 'react';\nimport { ScrollView, type ViewProps, View } from 'react-native';\n\n// --- Suggestions (horizontal scroll container) ---\n\ntype SuggestionsProps = ViewProps;\n\nfunction Suggestions({ className, children, ...props }: SuggestionsProps) {\n  return (\n    <View className={cn('px-4 py-2', className)} {...props}>\n      <ScrollView\n        horizontal\n        showsHorizontalScrollIndicator={false}\n        contentContainerClassName=\"gap-2\"\n      >\n        {children}\n      </ScrollView>\n    </View>\n  );\n}\n\n// --- Suggestion (individual chip) ---\n\ntype SuggestionProps = {\n  suggestion: string;\n  onPress?: (suggestion: string) => void;\n  className?: string;\n};\n\nfunction Suggestion({ suggestion, onPress, className }: SuggestionProps) {\n  const handlePress = React.useCallback(() => {\n    onPress?.(suggestion);\n  }, [suggestion, onPress]);\n\n  return (\n    <Button\n      variant=\"outline\"\n      size=\"sm\"\n      className={cn('rounded-full px-4', className)}\n      onPress={handlePress}\n    >\n      <Text className=\"text-sm\">{suggestion}</Text>\n    </Button>\n  );\n}\n\nexport { Suggestions, Suggestion };\nexport type { SuggestionsProps, SuggestionProps };\n"
+    },
+    {
+      "path": "lib/utils.ts",
+      "type": "registry:lib",
+      "target": "lib/utils.ts",
+      "content": "import { clsx, type ClassValue } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n"
+    }
+  ]
+}

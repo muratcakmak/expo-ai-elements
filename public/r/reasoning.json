@@ -1,0 +1,33 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "reasoning",
+  "type": "registry:ui",
+  "title": "Reasoning",
+  "description": "Expandable AI thinking/reasoning section with shimmer.",
+  "dependencies": [
+    "@rn-primitives/collapsible",
+    "clsx",
+    "lucide-react-native",
+    "react-native-reanimated",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/shimmer.json",
+    "https://reactnativereusables.com/r/uniwind/icon.json",
+    "https://reactnativereusables.com/r/uniwind/text.json"
+  ],
+  "files": [
+    {
+      "path": "components/ai/reasoning.tsx",
+      "type": "registry:component",
+      "target": "components/ai/reasoning.tsx",
+      "content": "import { cn } from '@/lib/utils';\nimport { Icon } from '@/components/ui/icon';\nimport { Text } from '@/components/ui/text';\nimport { Shimmer } from '@/components/ai/shimmer';\nimport * as Collapsible from '@rn-primitives/collapsible';\nimport { ChevronRightIcon } from 'lucide-react-native';\nimport * as React from 'react';\nimport { Pressable, View } from 'react-native';\nimport Animated, {\n  useAnimatedStyle,\n  useSharedValue,\n  withTiming,\n} from 'react-native-reanimated';\n\n// --- Context ---\n\ntype ReasoningContextValue = {\n  isStreaming: boolean;\n  durationText: string | null;\n};\n\nconst ReasoningContext = React.createContext<ReasoningContextValue>({\n  isStreaming: false,\n  durationText: null,\n});\n\nfunction useReasoningContext() {\n  return React.useContext(ReasoningContext);\n}\n\n// --- Reasoning (Root) ---\n\ntype ReasoningProps = {\n  isStreaming?: boolean;\n  open?: boolean;\n  defaultOpen?: boolean;\n  onOpenChange?: (open: boolean) => void;\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst Reasoning = React.memo(function Reasoning({\n  isStreaming = false,\n  open,\n  defaultOpen,\n  onOpenChange,\n  children,\n  className,\n}: ReasoningProps) {\n  const [internalOpen, setInternalOpen] = React.useState(defaultOpen ?? false);\n  const isControlled = open !== undefined;\n  const isOpen = isControlled ? open : internalOpen;\n\n  const streamStartRef = React.useRef<number | null>(null);\n  const [durationText, setDurationText] = React.useState<string | null>(null);\n\n  const handleOpenChange = React.useCallback(\n    (value: boolean) => {\n      if (!isControlled) {\n        setInternalOpen(value);\n      }\n      onOpenChange?.(value);\n    },\n    [isControlled, onOpenChange]\n  );\n\n  // Auto-open when streaming starts, auto-close 1s after streaming ends\n  React.useEffect(() => {\n    if (isStreaming) {\n      streamStartRef.current = Date.now();\n      setDurationText(null);\n      handleOpenChange(true);\n    } else if (streamStartRef.current !== null) {\n      const elapsed = Math.round((Date.now() - streamStartRef.current) / 1000);\n      setDurationText(`Thought for ${elapsed} second${elapsed !== 1 ? 's' : ''}`);\n      streamStartRef.current = null;\n      const timeout = setTimeout(() => handleOpenChange(false), 1000);\n      return () => clearTimeout(timeout);\n    }\n  }, [isStreaming, handleOpenChange]);\n\n  const contextValue = React.useMemo(\n    () => ({ isStreaming, durationText }),\n    [isStreaming, durationText]\n  );\n\n  return (\n    <ReasoningContext.Provider value={contextValue}>\n      <Collapsible.Root\n        open={isOpen}\n        onOpenChange={handleOpenChange}\n        className={cn('rounded-lg', className)}\n      >\n        {children}\n      </Collapsible.Root>\n    </ReasoningContext.Provider>\n  );\n});\n\nReasoning.displayName = 'Reasoning';\n\n// --- ReasoningTrigger ---\n\ntype ReasoningTriggerProps = {\n  className?: string;\n};\n\nconst ReasoningTrigger = React.memo(function ReasoningTrigger({\n  className,\n}: ReasoningTriggerProps) {\n  const { isStreaming, durationText } = useReasoningContext();\n  const rotation = useSharedValue(0);\n\n  const animatedChevronStyle = useAnimatedStyle(() => ({\n    transform: [{ rotateZ: `${rotation.value}deg` }],\n  }));\n\n  return (\n    <Collapsible.Trigger asChild>\n      <Pressable\n        className={cn('flex-row items-center gap-2 py-2', className)}\n        onPress={() => {\n          // Collapsible handles open state; we just animate the chevron\n        }}\n      >\n        {({ pressed }: { pressed: boolean }) => (\n          <>\n            <Animated.View style={animatedChevronStyle}>\n              <Icon as={ChevronRightIcon} className=\"text-muted-foreground size-4\" />\n            </Animated.View>\n            {isStreaming ? (\n              <Shimmer>Thinking...</Shimmer>\n            ) : (\n              <Text className=\"text-muted-foreground text-sm\">\n                {durationText ?? 'Reasoning'}\n              </Text>\n            )}\n          </>\n        )}\n      </Pressable>\n    </Collapsible.Trigger>\n  );\n});\n\nReasoningTrigger.displayName = 'ReasoningTrigger';\n\n// --- ReasoningContent ---\n\ntype ReasoningContentProps = {\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst ReasoningContent = React.memo(function ReasoningContent({\n  children,\n  className,\n}: ReasoningContentProps) {\n  return (\n    <Collapsible.Content>\n      <View className={cn('border-muted-foreground/20 border-l-2 pl-4 pt-1 pb-2', className)}>\n        {typeof children === 'string' ? (\n          <Text className=\"text-muted-foreground text-sm\">{children}</Text>\n        ) : (\n          children\n        )}\n      </View>\n    </Collapsible.Content>\n  );\n});\n\nReasoningContent.displayName = 'ReasoningContent';\n\nexport { Reasoning, ReasoningTrigger, ReasoningContent, useReasoningContext };\nexport type { ReasoningProps, ReasoningTriggerProps, ReasoningContentProps };\n"
+    },
+    {
+      "path": "lib/utils.ts",
+      "type": "registry:lib",
+      "target": "lib/utils.ts",
+      "content": "import { clsx, type ClassValue } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n"
+    }
+  ]
+}

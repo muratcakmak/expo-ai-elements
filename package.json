@@ -15,7 +15,8 @@
     "release:minor": "standard-version --release-as minor",
     "release:major": "standard-version --release-as major",
     "release:patch": "standard-version --release-as patch",
-    "release:dry": "standard-version --dry-run"
+    "release:dry": "standard-version --dry-run",
+    "registry:build": "bun scripts/build-registry.ts"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.144",

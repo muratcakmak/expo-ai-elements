@@ -1,0 +1,31 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "speech-input",
+  "type": "registry:ui",
+  "title": "SpeechInput",
+  "description": "Speech-to-text mic button with recording animation.",
+  "dependencies": [
+    "clsx",
+    "lucide-react-native",
+    "react-native-reanimated",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://reactnativereusables.com/r/uniwind/button.json",
+    "https://reactnativereusables.com/r/uniwind/icon.json"
+  ],
+  "files": [
+    {
+      "path": "components/ai/speech-input.tsx",
+      "type": "registry:component",
+      "target": "components/ai/speech-input.tsx",
+      "content": "import { cn } from '@/lib/utils';\nimport { Button } from '@/components/ui/button';\nimport { Icon } from '@/components/ui/icon';\nimport { MicIcon, SquareIcon } from 'lucide-react-native';\nimport * as React from 'react';\nimport { type ViewProps } from 'react-native';\nimport Animated, {\n  useAnimatedStyle,\n  useSharedValue,\n  withRepeat,\n  withTiming,\n  Easing,\n  FadeIn,\n  FadeOut,\n} from 'react-native-reanimated';\n\ntype SpeechInputProps = ViewProps & {\n  isRecording?: boolean;\n  onToggleRecording?: () => void;\n  onTranscript?: (text: string) => void;\n  disabled?: boolean;\n  className?: string;\n};\n\nconst AnimatedPulseRing = React.memo(function AnimatedPulseRing({\n  index,\n}: {\n  index: number;\n}) {\n  const scale = useSharedValue(1);\n  const opacity = useSharedValue(0.3);\n\n  React.useEffect(() => {\n    const delay = index * 300;\n    const startAnimation = () => {\n      scale.value = withRepeat(\n        withTiming(2, { duration: 2000, easing: Easing.out(Easing.ease) }),\n        -1,\n        false\n      );\n      opacity.value = withRepeat(\n        withTiming(0, { duration: 2000, easing: Easing.out(Easing.ease) }),\n        -1,\n        false\n      );\n    };\n\n    const timeout = setTimeout(startAnimation, delay);\n    return () => clearTimeout(timeout);\n  }, [index, scale, opacity]);\n\n  const animatedStyle = useAnimatedStyle(() => ({\n    transform: [{ scale: scale.value }],\n    opacity: opacity.value,\n    position: 'absolute' as const,\n    top: 0,\n    left: 0,\n    right: 0,\n    bottom: 0,\n    borderRadius: 9999,\n    borderWidth: 2,\n    borderColor: 'rgba(248, 113, 113, 0.3)',\n  }));\n\n  return <Animated.View style={animatedStyle} />;\n});\n\nconst SpeechInput = React.memo(function SpeechInput({\n  isRecording = false,\n  onToggleRecording,\n  disabled = false,\n  className,\n}: SpeechInputProps) {\n  const scale = useSharedValue(1);\n\n  React.useEffect(() => {\n    if (isRecording) {\n      scale.value = withRepeat(\n        withTiming(1.05, { duration: 800, easing: Easing.inOut(Easing.ease) }),\n        -1,\n        true\n      );\n    } else {\n      scale.value = withTiming(1, { duration: 200 });\n    }\n  }, [isRecording, scale]);\n\n  const animatedStyle = useAnimatedStyle(() => ({\n    transform: [{ scale: scale.value }],\n  }));\n\n  return (\n    <Animated.View\n      className=\"relative items-center justify-center\"\n      style={animatedStyle}\n    >\n      {/* Animated pulse rings */}\n      {isRecording && (\n        <Animated.View\n          entering={FadeIn.duration(300)}\n          exiting={FadeOut.duration(300)}\n          className=\"absolute inset-0\"\n        >\n          {[0, 1, 2].map((index) => (\n            <AnimatedPulseRing key={index} index={index} />\n          ))}\n        </Animated.View>\n      )}\n\n      {/* Main record button */}\n      <Button\n        size=\"icon\"\n        variant={isRecording ? 'destructive' : 'secondary'}\n        className={cn('z-10 size-10 rounded-full', className)}\n        onPress={onToggleRecording}\n        disabled={disabled}\n      >\n        <Icon\n          as={isRecording ? SquareIcon : MicIcon}\n          className={cn(\n            'size-5',\n            isRecording ? 'text-white' : 'text-secondary-foreground'\n          )}\n        />\n      </Button>\n    </Animated.View>\n  );\n});\n\nSpeechInput.displayName = 'SpeechInput';\n\nexport { SpeechInput };\nexport type { SpeechInputProps };\n"
+    },
+    {
+      "path": "lib/utils.ts",
+      "type": "registry:lib",
+      "target": "lib/utils.ts",
+      "content": "import { clsx, type ClassValue } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n"
+    }
+  ]
+}

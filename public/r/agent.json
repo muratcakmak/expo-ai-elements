@@ -1,0 +1,37 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "agent",
+  "type": "registry:ui",
+  "title": "Agent",
+  "description": "Agent execution status display with animations.",
+  "dependencies": [
+    "@rn-primitives/collapsible",
+    "clsx",
+    "lucide-react-native",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://reactnativereusables.com/r/uniwind/icon.json",
+    "https://reactnativereusables.com/r/uniwind/text.json"
+  ],
+  "files": [
+    {
+      "path": "components/ai/agent.tsx",
+      "type": "registry:component",
+      "target": "components/ai/agent.tsx",
+      "content": "import { cn } from '@/lib/utils';\nimport { MONO_STYLE } from '@/lib/fonts';\nimport { Icon } from '@/components/ui/icon';\nimport { Text } from '@/components/ui/text';\nimport * as Collapsible from '@rn-primitives/collapsible';\nimport { BotIcon, ChevronDownIcon } from 'lucide-react-native';\nimport * as React from 'react';\nimport { Pressable, View } from 'react-native';\n\n// --- Agent (container) ---\n\ntype AgentProps = {\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst Agent = React.memo(function Agent({ children, className }: AgentProps) {\n  return (\n    <View className={cn('border-border rounded-md border', className)}>\n      {children}\n    </View>\n  );\n});\n\nAgent.displayName = 'Agent';\n\n// --- AgentHeader ---\n\ntype AgentHeaderProps = {\n  name: string;\n  model?: string;\n  className?: string;\n};\n\nconst AgentHeader = React.memo(function AgentHeader({\n  name,\n  model,\n  className,\n}: AgentHeaderProps) {\n  return (\n    <View className={cn('flex-row items-center justify-between gap-4 p-3', className)}>\n      <View className=\"flex-row items-center gap-2\">\n        <Icon as={BotIcon} className=\"text-muted-foreground size-4\" />\n        <Text className=\"text-foreground text-sm font-medium\">{name}</Text>\n        {model ? (\n          <View className=\"bg-secondary rounded-full px-2 py-0.5\">\n            <Text style={MONO_STYLE} className=\"text-secondary-foreground text-xs\">{model}</Text>\n          </View>\n        ) : null}\n      </View>\n    </View>\n  );\n});\n\nAgentHeader.displayName = 'AgentHeader';\n\n// --- AgentContent ---\n\ntype AgentContentProps = {\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst AgentContent = React.memo(function AgentContent({\n  children,\n  className,\n}: AgentContentProps) {\n  return <View className={cn('gap-4 p-4 pt-0', className)}>{children}</View>;\n});\n\nAgentContent.displayName = 'AgentContent';\n\n// --- AgentInstructions ---\n\ntype AgentInstructionsProps = {\n  children: string;\n  className?: string;\n};\n\nconst AgentInstructions = React.memo(function AgentInstructions({\n  children,\n  className,\n}: AgentInstructionsProps) {\n  return (\n    <View className={cn('gap-2', className)}>\n      <Text className=\"text-muted-foreground text-sm font-medium\">Instructions</Text>\n      <View className=\"bg-muted/50 rounded-md p-3\">\n        <Text className=\"text-muted-foreground text-sm\">{children}</Text>\n      </View>\n    </View>\n  );\n});\n\nAgentInstructions.displayName = 'AgentInstructions';\n\n// --- AgentTools (accordion-like container) ---\n\ntype AgentToolsProps = {\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst AgentTools = React.memo(function AgentTools({\n  children,\n  className,\n}: AgentToolsProps) {\n  return (\n    <View className={cn('gap-2', className)}>\n      <Text className=\"text-muted-foreground text-sm font-medium\">Tools</Text>\n      <View className=\"border-border rounded-md border\">{children}</View>\n    </View>\n  );\n});\n\nAgentTools.displayName = 'AgentTools';\n\n// --- AgentTool (individual tool with collapsible schema) ---\n\ntype AgentToolSchema = {\n  description?: string;\n  inputSchema?: Record<string, unknown>;\n  jsonSchema?: Record<string, unknown>;\n};\n\ntype AgentToolProps = {\n  tool: AgentToolSchema;\n  className?: string;\n};\n\nconst AgentTool = React.memo(function AgentTool({ tool, className }: AgentToolProps) {\n  const schema =\n    tool.jsonSchema ?? tool.inputSchema;\n\n  return (\n    <Collapsible.Root className={cn('border-border border-b last:border-b-0', className)}>\n      <Collapsible.Trigger asChild>\n        <Pressable className=\"flex-row items-center justify-between px-3 py-2\">\n          <Text className=\"text-foreground flex-1 text-sm\">\n            {tool.description ?? 'No description'}\n          </Text>\n          <Icon as={ChevronDownIcon} className=\"text-muted-foreground size-4\" />\n        </Pressable>\n      </Collapsible.Trigger>\n      <Collapsible.Content>\n        <View className=\"px-3 pb-3\">\n          <View className=\"bg-muted/50 rounded-md p-3\">\n            <Text style={MONO_STYLE} className=\"text-muted-foreground text-xs\">\n              {schema ? JSON.stringify(schema, null, 2) : 'No schema available'}\n            </Text>\n          </View>\n        </View>\n      </Collapsible.Content>\n    </Collapsible.Root>\n  );\n});\n\nAgentTool.displayName = 'AgentTool';\n\n// --- AgentOutput ---\n\ntype AgentOutputProps = {\n  schema: string;\n  className?: string;\n};\n\nconst AgentOutput = React.memo(function AgentOutput({\n  schema,\n  className,\n}: AgentOutputProps) {\n  return (\n    <View className={cn('gap-2', className)}>\n      <Text className=\"text-muted-foreground text-sm font-medium\">Output Schema</Text>\n      <View className=\"bg-muted/50 rounded-md p-3\">\n        <Text style={MONO_STYLE} className=\"text-foreground text-xs\">{schema}</Text>\n      </View>\n    </View>\n  );\n});\n\nAgentOutput.displayName = 'AgentOutput';\n\nexport {\n  Agent,\n  AgentHeader,\n  AgentContent,\n  AgentInstructions,\n  AgentTools,\n  AgentTool,\n  AgentOutput,\n};\nexport type {\n  AgentProps,\n  AgentHeaderProps,\n  AgentContentProps,\n  AgentInstructionsProps,\n  AgentToolsProps,\n  AgentToolProps,\n  AgentToolSchema,\n  AgentOutputProps,\n};\n"
+    },
+    {
+      "path": "lib/utils.ts",
+      "type": "registry:lib",
+      "target": "lib/utils.ts",
+      "content": "import { clsx, type ClassValue } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n"
+    },
+    {
+      "path": "lib/fonts.ts",
+      "type": "registry:lib",
+      "target": "lib/fonts.ts",
+      "content": "import { Platform } from 'react-native';\n\nconst MONO_FONT_FAMILY = Platform.select({\n  ios: 'Menlo',\n  android: 'monospace',\n  default: 'monospace',\n});\n\nexport const MONO_STYLE = { fontFamily: MONO_FONT_FAMILY } as const;\n"
+    }
+  ]
+}

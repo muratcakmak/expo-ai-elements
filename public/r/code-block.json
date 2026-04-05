@@ -1,0 +1,38 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "code-block",
+  "type": "registry:ui",
+  "title": "CodeBlock",
+  "description": "Syntax-highlighted code display with copy button.",
+  "dependencies": [
+    "clsx",
+    "expo-clipboard",
+    "lucide-react-native",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://reactnativereusables.com/r/uniwind/button.json",
+    "https://reactnativereusables.com/r/uniwind/icon.json",
+    "https://reactnativereusables.com/r/uniwind/text.json"
+  ],
+  "files": [
+    {
+      "path": "components/ai/code-block.tsx",
+      "type": "registry:component",
+      "target": "components/ai/code-block.tsx",
+      "content": "import { cn } from '@/lib/utils';\nimport { MONO_STYLE } from '@/lib/fonts';\nimport { Text } from '@/components/ui/text';\nimport { Icon } from '@/components/ui/icon';\nimport { Button } from '@/components/ui/button';\nimport { CheckIcon, CopyIcon } from 'lucide-react-native';\nimport * as Clipboard from 'expo-clipboard';\nimport * as React from 'react';\nimport { ScrollView, View } from 'react-native';\n\n// --- Context ---\n\ntype CodeBlockContextValue = {\n  code: string;\n};\n\nconst CodeBlockContext = React.createContext<CodeBlockContextValue>({\n  code: '',\n});\n\nfunction useCodeBlockContext() {\n  return React.useContext(CodeBlockContext);\n}\n\n// --- CodeBlock (Root) ---\n\ntype CodeBlockProps = {\n  code: string;\n  language?: string;\n  showLineNumbers?: boolean;\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst CodeBlock = React.memo(function CodeBlock({\n  code,\n  language,\n  showLineNumbers = false,\n  children,\n  className,\n}: CodeBlockProps) {\n  const contextValue = React.useMemo(() => ({ code }), [code]);\n\n  return (\n    <CodeBlockContext.Provider value={contextValue}>\n      <View\n        className={cn('overflow-hidden rounded-lg border border-border bg-background', className)}\n      >\n        {children ?? (\n          <>\n            <CodeBlockHeader>\n              <CodeBlockTitle>{language ?? 'code'}</CodeBlockTitle>\n              <CodeBlockCopyButton />\n            </CodeBlockHeader>\n            <CodeBlockContent code={code} showLineNumbers={showLineNumbers} />\n          </>\n        )}\n      </View>\n    </CodeBlockContext.Provider>\n  );\n});\n\nCodeBlock.displayName = 'CodeBlock';\n\n// --- CodeBlockHeader ---\n\ntype CodeBlockHeaderProps = {\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst CodeBlockHeader = React.memo(function CodeBlockHeader({\n  children,\n  className,\n}: CodeBlockHeaderProps) {\n  return (\n    <View\n      className={cn(\n        'flex-row items-center justify-between border-b border-border bg-muted/80 px-3 py-2',\n        className\n      )}\n    >\n      {children}\n    </View>\n  );\n});\n\nCodeBlockHeader.displayName = 'CodeBlockHeader';\n\n// --- CodeBlockTitle ---\n\ntype CodeBlockTitleProps = {\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst CodeBlockTitle = React.memo(function CodeBlockTitle({\n  children,\n  className,\n}: CodeBlockTitleProps) {\n  return (\n    <View className={cn('flex-row items-center gap-2', className)}>\n      {typeof children === 'string' ? (\n        <Text style={MONO_STYLE} className=\"text-muted-foreground text-xs\">{children}</Text>\n      ) : (\n        children\n      )}\n    </View>\n  );\n});\n\nCodeBlockTitle.displayName = 'CodeBlockTitle';\n\n// --- CodeBlockCopyButton ---\n\ntype CodeBlockCopyButtonProps = {\n  onCopy?: () => void;\n  onError?: (error: Error) => void;\n  timeout?: number;\n  className?: string;\n};\n\nconst CodeBlockCopyButton = React.memo(function CodeBlockCopyButton({\n  onCopy,\n  onError,\n  timeout = 2000,\n  className,\n}: CodeBlockCopyButtonProps) {\n  const [isCopied, setIsCopied] = React.useState(false);\n  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);\n  const { code } = useCodeBlockContext();\n\n  const copyToClipboard = React.useCallback(async () => {\n    try {\n      if (!isCopied) {\n        await Clipboard.setStringAsync(code);\n        setIsCopied(true);\n        onCopy?.();\n        timeoutRef.current = setTimeout(() => setIsCopied(false), timeout);\n      }\n    } catch (error) {\n      onError?.(error as Error);\n    }\n  }, [code, onCopy, onError, timeout, isCopied]);\n\n  React.useEffect(() => {\n    return () => {\n      if (timeoutRef.current) {\n        clearTimeout(timeoutRef.current);\n      }\n    };\n  }, []);\n\n  return (\n    <Button\n      variant=\"ghost\"\n      size=\"icon\"\n      onPress={copyToClipboard}\n      className={cn('h-7 w-7 shrink-0', className)}\n    >\n      <Icon\n        as={isCopied ? CheckIcon : CopyIcon}\n        className={cn('size-3.5', isCopied ? 'text-green-500' : 'text-muted-foreground')}\n      />\n    </Button>\n  );\n});\n\nCodeBlockCopyButton.displayName = 'CodeBlockCopyButton';\n\n// --- CodeBlockContent ---\n\ntype CodeBlockContentProps = {\n  code: string;\n  showLineNumbers?: boolean;\n  className?: string;\n};\n\nconst CodeBlockContent = React.memo(function CodeBlockContent({\n  code,\n  showLineNumbers = false,\n  className,\n}: CodeBlockContentProps) {\n  const lines = React.useMemo(() => code.split('\\n'), [code]);\n\n  return (\n    <ScrollView horizontal showsHorizontalScrollIndicator={false}>\n      <View className={cn('flex-row px-3 py-3', className)}>\n        {showLineNumbers && (\n          <View className=\"mr-3 items-end\">\n            {lines.map((_, index) => (\n              <Text\n                key={`ln-${index}`}\n                style={MONO_STYLE}\n                className=\"text-muted-foreground/50 text-xs leading-5\"\n              >\n                {String(index + 1)}\n              </Text>\n            ))}\n          </View>\n        )}\n        <View>\n          {lines.map((line, index) => (\n            <Text key={`code-${index}`} style={MONO_STYLE} className=\"text-foreground text-xs leading-5\">\n              {line || ' '}\n            </Text>\n          ))}\n        </View>\n      </View>\n    </ScrollView>\n  );\n});\n\nCodeBlockContent.displayName = 'CodeBlockContent';\n\nexport {\n  CodeBlock,\n  CodeBlockHeader,\n  CodeBlockTitle,\n  CodeBlockCopyButton,\n  CodeBlockContent,\n  useCodeBlockContext,\n};\nexport type {\n  CodeBlockProps,\n  CodeBlockHeaderProps,\n  CodeBlockTitleProps,\n  CodeBlockCopyButtonProps,\n  CodeBlockContentProps,\n};\n"
+    },
+    {
+      "path": "lib/utils.ts",
+      "type": "registry:lib",
+      "target": "lib/utils.ts",
+      "content": "import { clsx, type ClassValue } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n"
+    },
+    {
+      "path": "lib/fonts.ts",
+      "type": "registry:lib",
+      "target": "lib/fonts.ts",
+      "content": "import { Platform } from 'react-native';\n\nconst MONO_FONT_FAMILY = Platform.select({\n  ios: 'Menlo',\n  android: 'monospace',\n  default: 'monospace',\n});\n\nexport const MONO_STYLE = { fontFamily: MONO_FONT_FAMILY } as const;\n"
+    }
+  ]
+}

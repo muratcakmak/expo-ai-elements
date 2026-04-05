@@ -1,0 +1,31 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "task",
+  "type": "registry:ui",
+  "title": "Task",
+  "description": "Individual task card with status tracking.",
+  "dependencies": [
+    "@rn-primitives/collapsible",
+    "clsx",
+    "lucide-react-native",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://reactnativereusables.com/r/uniwind/icon.json",
+    "https://reactnativereusables.com/r/uniwind/text.json"
+  ],
+  "files": [
+    {
+      "path": "components/ai/task.tsx",
+      "type": "registry:component",
+      "target": "components/ai/task.tsx",
+      "content": "import { cn } from '@/lib/utils';\nimport { Icon } from '@/components/ui/icon';\nimport { Text } from '@/components/ui/text';\nimport * as Collapsible from '@rn-primitives/collapsible';\nimport { ChevronDownIcon, SearchIcon } from 'lucide-react-native';\nimport * as React from 'react';\nimport { Pressable, View } from 'react-native';\n\n// --- TaskItemFile ---\n\ntype TaskItemFileProps = {\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst TaskItemFile = React.memo(function TaskItemFile({\n  children,\n  className,\n}: TaskItemFileProps) {\n  return (\n    <View\n      className={cn(\n        'bg-secondary border-border flex-row items-center gap-1 rounded-md border px-1.5 py-0.5',\n        className\n      )}\n    >\n      {typeof children === 'string' ? (\n        <Text className=\"text-foreground text-xs\">{children}</Text>\n      ) : (\n        children\n      )}\n    </View>\n  );\n});\n\nTaskItemFile.displayName = 'TaskItemFile';\n\n// --- TaskItem ---\n\ntype TaskItemProps = {\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst TaskItem = React.memo(function TaskItem({ children, className }: TaskItemProps) {\n  return (\n    <View className={cn('flex-row items-center', className)}>\n      {typeof children === 'string' ? (\n        <Text className=\"text-muted-foreground text-sm\">{children}</Text>\n      ) : (\n        children\n      )}\n    </View>\n  );\n});\n\nTaskItem.displayName = 'TaskItem';\n\n// --- Task (root with collapsible) ---\n\ntype TaskProps = {\n  defaultOpen?: boolean;\n  open?: boolean;\n  onOpenChange?: (open: boolean) => void;\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst Task = React.memo(function Task({\n  defaultOpen = true,\n  open,\n  onOpenChange,\n  children,\n  className,\n}: TaskProps) {\n  return (\n    <Collapsible.Root\n      defaultOpen={defaultOpen}\n      open={open}\n      onOpenChange={onOpenChange}\n      className={cn(className)}\n    >\n      {children}\n    </Collapsible.Root>\n  );\n});\n\nTask.displayName = 'Task';\n\n// --- TaskTrigger ---\n\ntype TaskTriggerProps = {\n  title: string;\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst TaskTrigger = React.memo(function TaskTrigger({\n  title,\n  children,\n  className,\n}: TaskTriggerProps) {\n  return (\n    <Collapsible.Trigger asChild>\n      <Pressable className={cn('flex-row items-center gap-2', className)}>\n        {children ?? (\n          <>\n            <Icon as={SearchIcon} className=\"text-muted-foreground size-4\" />\n            <Text className=\"text-muted-foreground flex-1 text-sm\">{title}</Text>\n            <Icon as={ChevronDownIcon} className=\"text-muted-foreground size-4\" />\n          </>\n        )}\n      </Pressable>\n    </Collapsible.Trigger>\n  );\n});\n\nTaskTrigger.displayName = 'TaskTrigger';\n\n// --- TaskContent ---\n\ntype TaskContentProps = {\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst TaskContent = React.memo(function TaskContent({ children, className }: TaskContentProps) {\n  return (\n    <Collapsible.Content>\n      <View className={cn('border-muted mt-4 gap-2 border-l-2 pl-4', className)}>\n        {children}\n      </View>\n    </Collapsible.Content>\n  );\n});\n\nTaskContent.displayName = 'TaskContent';\n\nexport { Task, TaskTrigger, TaskContent, TaskItem, TaskItemFile };\nexport type { TaskProps, TaskTriggerProps, TaskContentProps, TaskItemProps, TaskItemFileProps };\n"
+    },
+    {
+      "path": "lib/utils.ts",
+      "type": "registry:lib",
+      "target": "lib/utils.ts",
+      "content": "import { clsx, type ClassValue } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n"
+    }
+  ]
+}

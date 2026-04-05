@@ -1,0 +1,31 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "conversation",
+  "type": "registry:ui",
+  "title": "Conversation",
+  "description": "Scrollable chat container with auto-scroll and keyboard avoidance.",
+  "dependencies": [
+    "clsx",
+    "lucide-react-native",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://reactnativereusables.com/r/uniwind/button.json",
+    "https://reactnativereusables.com/r/uniwind/icon.json",
+    "https://reactnativereusables.com/r/uniwind/text.json"
+  ],
+  "files": [
+    {
+      "path": "components/ai/conversation.tsx",
+      "type": "registry:component",
+      "target": "components/ai/conversation.tsx",
+      "content": "import { cn } from '@/lib/utils';\nimport { Button } from '@/components/ui/button';\nimport { Icon } from '@/components/ui/icon';\nimport { Text } from '@/components/ui/text';\nimport { ArrowDownIcon } from 'lucide-react-native';\nimport * as React from 'react';\nimport {\n  ScrollView,\n  View,\n  type ViewProps,\n  KeyboardAvoidingView,\n  Platform,\n  type NativeSyntheticEvent,\n  type NativeScrollEvent,\n} from 'react-native';\n\n// --- Conversation ---\n\ntype ConversationProps<T> = {\n  data: T[] | null | undefined;\n  renderItem: (info: { item: T; index: number }) => React.ReactNode;\n  keyExtractor?: (item: T, index: number) => string;\n  className?: string;\n};\n\nfunction Conversation<T>({\n  data,\n  renderItem,\n  keyExtractor,\n  className,\n}: ConversationProps<T>) {\n  const scrollRef = React.useRef<ScrollView>(null);\n  const [isAtBottom, setIsAtBottom] = React.useState(true);\n\n  const scrollToBottom = React.useCallback(() => {\n    scrollRef.current?.scrollToEnd({ animated: true });\n  }, []);\n\n  // Auto-scroll when new data arrives and user is at bottom\n  React.useEffect(() => {\n    if (isAtBottom && data && data.length > 0) {\n      const timeout = setTimeout(scrollToBottom, 50);\n      return () => clearTimeout(timeout);\n    }\n  }, [data?.length, isAtBottom, scrollToBottom]);\n\n  const handleScroll = React.useCallback(\n    (event: NativeSyntheticEvent<NativeScrollEvent>) => {\n      const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;\n      const distanceFromBottom = contentSize.height - layoutMeasurement.height - contentOffset.y;\n      setIsAtBottom(distanceFromBottom < 50);\n    },\n    []\n  );\n\n  return (\n    <KeyboardAvoidingView\n      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}\n      className={cn('flex-1', className)}\n    >\n      <View className=\"flex-1\">\n        <ScrollView\n          ref={scrollRef}\n          onScroll={handleScroll}\n          scrollEventThrottle={16}\n          contentContainerClassName=\"pb-4 pt-2\"\n          showsVerticalScrollIndicator={false}\n          nestedScrollEnabled\n        >\n          {data?.map((item, index) => (\n            <React.Fragment key={keyExtractor ? keyExtractor(item, index) : index.toString()}>\n              {renderItem({ item, index })}\n            </React.Fragment>\n          ))}\n        </ScrollView>\n        {!isAtBottom && (\n          <ConversationScrollButton onPress={scrollToBottom} />\n        )}\n      </View>\n    </KeyboardAvoidingView>\n  );\n}\n\n// --- ConversationScrollButton ---\n\ntype ConversationScrollButtonProps = {\n  onPress: () => void;\n  className?: string;\n};\n\nfunction ConversationScrollButton({ onPress, className }: ConversationScrollButtonProps) {\n  return (\n    <View className={cn('absolute bottom-4 self-center', className)}>\n      <Button\n        variant=\"outline\"\n        size=\"icon\"\n        className=\"size-9 rounded-full shadow-md\"\n        onPress={onPress}\n      >\n        <Icon as={ArrowDownIcon} className=\"text-muted-foreground size-4\" />\n      </Button>\n    </View>\n  );\n}\n\n// --- ConversationEmptyState ---\n\ntype ConversationEmptyStateProps = ViewProps & {\n  title?: string;\n  description?: string;\n  icon?: React.ReactNode;\n};\n\nfunction ConversationEmptyState({\n  title = 'Start a conversation',\n  description = 'Send a message to begin.',\n  icon,\n  className,\n  ...props\n}: ConversationEmptyStateProps) {\n  return (\n    <View\n      className={cn('flex-1 items-center justify-center gap-4 p-8', className)}\n      {...props}\n    >\n      {icon}\n      <View className=\"items-center gap-2\">\n        <Text className=\"text-foreground text-lg font-semibold\">{title}</Text>\n        <Text className=\"text-muted-foreground text-center text-sm\">{description}</Text>\n      </View>\n    </View>\n  );\n}\n\nexport {\n  Conversation,\n  ConversationScrollButton,\n  ConversationEmptyState,\n};\nexport type {\n  ConversationProps,\n  ConversationScrollButtonProps,\n  ConversationEmptyStateProps,\n};\n"
+    },
+    {
+      "path": "lib/utils.ts",
+      "type": "registry:lib",
+      "target": "lib/utils.ts",
+      "content": "import { clsx, type ClassValue } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n"
+    }
+  ]
+}

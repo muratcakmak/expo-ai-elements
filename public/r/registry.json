@@ -1,0 +1,409 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "expo-ai-elements",
+  "homepage": "https://github.com/muratcakmak/expo-ai-elements",
+  "items": [
+    {
+      "name": "conversation",
+      "type": "registry:ui",
+      "title": "Conversation",
+      "description": "Scrollable chat container with auto-scroll and keyboard avoidance.",
+      "dependencies": [
+        "clsx",
+        "lucide-react-native",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/button.json",
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "message",
+      "type": "registry:ui",
+      "title": "Message",
+      "description": "Role-based message bubbles for user, assistant, and system messages.",
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "message-response",
+      "type": "registry:ui",
+      "title": "MessageResponse",
+      "description": "Streaming markdown renderer for assistant messages.",
+      "dependencies": [
+        "clsx",
+        "react-native-enriched-markdown",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/shimmer.json"
+      ]
+    },
+    {
+      "name": "suggestion",
+      "type": "registry:ui",
+      "title": "Suggestion",
+      "description": "Tappable suggestion chips in a horizontal scroll.",
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/button.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "checkpoint",
+      "type": "registry:ui",
+      "title": "Checkpoint",
+      "description": "Visual divider marking conversation checkpoints.",
+      "dependencies": [
+        "clsx",
+        "lucide-react-native",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/button.json",
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "citation",
+      "type": "registry:ui",
+      "title": "Citation",
+      "description": "Inline citation references and source list.",
+      "dependencies": [
+        "clsx",
+        "lucide-react-native",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "code-block",
+      "type": "registry:ui",
+      "title": "CodeBlock",
+      "description": "Syntax-highlighted code display with copy button.",
+      "dependencies": [
+        "clsx",
+        "expo-clipboard",
+        "lucide-react-native",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/button.json",
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "terminal",
+      "type": "registry:ui",
+      "title": "Terminal",
+      "description": "Monospace terminal output display.",
+      "dependencies": [
+        "clsx",
+        "expo-clipboard",
+        "lucide-react-native",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/button.json",
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "stack-trace",
+      "type": "registry:ui",
+      "title": "StackTrace",
+      "description": "Collapsible error stack trace display.",
+      "dependencies": [
+        "@rn-primitives/collapsible",
+        "clsx",
+        "expo-clipboard",
+        "lucide-react-native",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/button.json",
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "test-results",
+      "type": "registry:ui",
+      "title": "TestResults",
+      "description": "Pass/fail test result display with details.",
+      "dependencies": [
+        "@rn-primitives/collapsible",
+        "clsx",
+        "lucide-react-native",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "schema-display",
+      "type": "registry:ui",
+      "title": "SchemaDisplay",
+      "description": "Interactive JSON/schema viewer with syntax coloring.",
+      "dependencies": [
+        "@rn-primitives/collapsible",
+        "clsx",
+        "lucide-react-native",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "reasoning",
+      "type": "registry:ui",
+      "title": "Reasoning",
+      "description": "Expandable AI thinking/reasoning section with shimmer.",
+      "dependencies": [
+        "@rn-primitives/collapsible",
+        "clsx",
+        "lucide-react-native",
+        "react-native-reanimated",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/shimmer.json",
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "chain-of-thought",
+      "type": "registry:ui",
+      "title": "ChainOfThought",
+      "description": "Step-by-step thought process visualization.",
+      "dependencies": [
+        "@rn-primitives/collapsible",
+        "clsx",
+        "lucide-react-native",
+        "react-native-reanimated",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "tool",
+      "type": "registry:ui",
+      "title": "Tool",
+      "description": "Tool call visualization with args and results.",
+      "dependencies": [
+        "@rn-primitives/collapsible",
+        "clsx",
+        "lucide-react-native",
+        "react-native-reanimated",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/shimmer.json",
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "plan",
+      "type": "registry:ui",
+      "title": "Plan",
+      "description": "Agent plan display with ordered steps and progress.",
+      "dependencies": [
+        "@rn-primitives/collapsible",
+        "clsx",
+        "lucide-react-native",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/shimmer.json",
+        "https://reactnativereusables.com/r/uniwind/button.json",
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "task",
+      "type": "registry:ui",
+      "title": "Task",
+      "description": "Individual task card with status tracking.",
+      "dependencies": [
+        "@rn-primitives/collapsible",
+        "clsx",
+        "lucide-react-native",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "agent",
+      "type": "registry:ui",
+      "title": "Agent",
+      "description": "Agent execution status display with animations.",
+      "dependencies": [
+        "@rn-primitives/collapsible",
+        "clsx",
+        "lucide-react-native",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "artifact",
+      "type": "registry:ui",
+      "title": "Artifact",
+      "description": "Tabbed container for AI-generated content.",
+      "dependencies": [
+        "clsx",
+        "lucide-react-native",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/button.json",
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "file-tree",
+      "type": "registry:ui",
+      "title": "FileTree",
+      "description": "Recursive file/folder tree with expand/collapse.",
+      "dependencies": [
+        "@rn-primitives/collapsible",
+        "clsx",
+        "lucide-react-native",
+        "react-native-reanimated",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "web-preview",
+      "type": "registry:ui",
+      "title": "WebPreview",
+      "description": "WebView wrapper for previewing web content.",
+      "dependencies": [
+        "clsx",
+        "react-native-webview",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/button.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "attachments",
+      "type": "registry:ui",
+      "title": "Attachments",
+      "description": "File attachment display with previews.",
+      "dependencies": [
+        "clsx",
+        "lucide-react-native",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "prompt-input",
+      "type": "registry:ui",
+      "title": "PromptInput",
+      "description": "Rich chat input with send/stop buttons.",
+      "dependencies": [
+        "clsx",
+        "lucide-react-native",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/button.json",
+        "https://reactnativereusables.com/r/uniwind/icon.json"
+      ]
+    },
+    {
+      "name": "speech-input",
+      "type": "registry:ui",
+      "title": "SpeechInput",
+      "description": "Speech-to-text mic button with recording animation.",
+      "dependencies": [
+        "clsx",
+        "lucide-react-native",
+        "react-native-reanimated",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/button.json",
+        "https://reactnativereusables.com/r/uniwind/icon.json"
+      ]
+    },
+    {
+      "name": "open-in-chat",
+      "type": "registry:ui",
+      "title": "OpenInChat",
+      "description": "Deep link buttons to external AI apps.",
+      "dependencies": [
+        "@rn-primitives/dropdown-menu",
+        "clsx",
+        "expo-linking",
+        "lucide-react-native",
+        "react-native-svg",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/button.json",
+        "https://reactnativereusables.com/r/uniwind/icon.json",
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    },
+    {
+      "name": "shimmer",
+      "type": "registry:ui",
+      "title": "Shimmer",
+      "description": "Animated loading indicator for streaming states.",
+      "dependencies": [
+        "clsx",
+        "react-native-reanimated",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://reactnativereusables.com/r/uniwind/text.json"
+      ]
+    }
+  ]
+}

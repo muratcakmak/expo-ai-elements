@@ -35,9 +35,100 @@ Building AI chat UIs on mobile is painful. You need streaming markdown, code blo
 | **Input** | PromptInput, SpeechInput, OpenInChat |
 | **Utilities** | Shimmer |
 
-## Quick Start
+## Installation
+
+### Prerequisites
+
+You'll need [Uniwind](https://uniwind.dev) (Tailwind CSS for React Native) and [React Native Reusables](https://reactnativereusables.com) set up in your project.
+
+### Add Components via CLI (recommended)
+
+Add individual components using the [React Native Reusables CLI](https://reactnativereusables.com). Each command installs the component source, its npm dependencies, and any dependent components automatically:
 
 ```bash
+npx @react-native-reusables/cli@latest add https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/message.json
+npx @react-native-reusables/cli@latest add https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/message-response.json
+npx @react-native-reusables/cli@latest add https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/conversation.json
+npx @react-native-reusables/cli@latest add https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/prompt-input.json
+```
+
+Browse all available components in the [registry index](https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/registry.json).
+
+### Alternative: npm package
+
+Install all components at once as a package:
+
+```bash
+npm install expo-ai-elements
+```
+
+With the npm package, you'll also need to install peer dependencies:
+
+```bash
+npx expo install react-native-enriched-markdown react-native-reanimated react-native-gesture-handler react-native-svg lucide-react-native expo-clipboard expo-haptics
+```
+
+## Usage
+
+Components follow the **shadcn/ui copy-paste pattern** — you own every line of code:
+
+```tsx
+import {
+  Conversation, Message, MessageContent, MessageText,
+  MessageResponse, PromptInput, Suggestions, Suggestion,
+} from 'expo-ai-elements/components/ai';
+
+export default function ChatScreen() {
+  const { messages, isLoading, sendMessage } = useChat(); // Vercel AI SDK
+
+  return (
+    <>
+      <Conversation
+        data={messages}
+        renderItem={({ item }) => (
+          <Message role={item.role}>
+            <MessageContent>
+              {item.role === 'assistant' ? (
+                <MessageResponse isStreaming={isLoading}>
+                  {item.content}
+                </MessageResponse>
+              ) : (
+                <MessageText>{item.content}</MessageText>
+              )}
+            </MessageContent>
+          </Message>
+        )}
+      />
+      <PromptInput onSubmit={sendMessage} isLoading={isLoading} />
+    </>
+  );
+}
+```
+
+Every component is composable with sub-components for full customization:
+
+```tsx
+import {
+  CodeBlock, CodeBlockHeader, CodeBlockTitle,
+  CodeBlockCopyButton, CodeBlockContent,
+} from 'expo-ai-elements/components/ai';
+
+<CodeBlock code={code} language="typescript">
+  <CodeBlockHeader>
+    <CodeBlockTitle>typescript</CodeBlockTitle>
+    <CodeBlockCopyButton />
+  </CodeBlockHeader>
+  <CodeBlockContent code={code} showLineNumbers />
+</CodeBlock>
+```
+
+## Running the Demo App
+
+```bash
+# Clone the repo
+git clone https://github.com/muratcakmak/expo-ai-elements.git
+cd expo-ai-elements
+
 # Install dependencies
 bun install
 
@@ -48,39 +139,7 @@ npx expo run:ios
 npx expo run:android
 ```
 
-The app includes a built-in component showcase (Storybook-like) with interactive demos for every component, plus a full chat demo with simulated streaming.
-
-## Usage
-
-Components follow the shadcn/ui copy-paste pattern. Copy any file from `components/ai/` into your project:
-
-```tsx
-import { Message, MessageContent, MessageResponse } from '@/components/ai';
-import { PromptInput } from '@/components/ai';
-
-<Message role="assistant">
-  <MessageContent>
-    <MessageResponse isStreaming={isLoading}>
-      {streamingText}
-    </MessageResponse>
-  </MessageContent>
-</Message>
-<PromptInput onSubmit={sendMessage} isLoading={isLoading} />
-```
-
-Every component is composable with sub-components for full customization:
-
-```tsx
-import { CodeBlock, CodeBlockHeader, CodeBlockTitle, CodeBlockCopyButton, CodeBlockContent } from '@/components/ai';
-
-<CodeBlock code={code} language="typescript">
-  <CodeBlockHeader>
-    <CodeBlockTitle>typescript</CodeBlockTitle>
-    <CodeBlockCopyButton />
-  </CodeBlockHeader>
-  <CodeBlockContent code={code} showLineNumbers />
-</CodeBlock>
-```
+The demo includes a component showcase with interactive demos for every component, plus a full chat demo with simulated streaming.
 
 ## Stack
 

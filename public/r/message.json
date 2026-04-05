@@ -1,0 +1,28 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "message",
+  "type": "registry:ui",
+  "title": "Message",
+  "description": "Role-based message bubbles for user, assistant, and system messages.",
+  "dependencies": [
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://reactnativereusables.com/r/uniwind/text.json"
+  ],
+  "files": [
+    {
+      "path": "components/ai/message.tsx",
+      "type": "registry:component",
+      "target": "components/ai/message.tsx",
+      "content": "import { cn } from '@/lib/utils';\nimport { Text } from '@/components/ui/text';\nimport * as React from 'react';\nimport { View, type ViewProps } from 'react-native';\n\ntype MessageRole = 'user' | 'assistant' | 'system';\n\ntype MessageContextValue = {\n  role: MessageRole;\n};\n\nconst MessageContext = React.createContext<MessageContextValue>({ role: 'assistant' });\n\nfunction useMessageContext() {\n  return React.useContext(MessageContext);\n}\n\n// --- Message ---\n\ntype MessageProps = Omit<ViewProps, 'role'> & {\n  role: MessageRole;\n};\n\nfunction Message({ role, className, children, ...props }: MessageProps) {\n  const contextValue = React.useMemo(() => ({ role }), [role]);\n\n  return (\n    <MessageContext.Provider value={contextValue}>\n      <View\n        className={cn(\n          'flex-row gap-3 px-4 py-2',\n          role === 'user' && 'flex-row-reverse',\n          role === 'system' && 'justify-center',\n          className\n        )}\n        {...props}\n      >\n        {children}\n      </View>\n    </MessageContext.Provider>\n  );\n}\n\n// --- MessageContent ---\n\ntype MessageContentProps = ViewProps;\n\nfunction MessageContent({ className, children, ...props }: MessageContentProps) {\n  const { role } = useMessageContext();\n\n  return (\n    <View\n      className={cn(\n        'max-w-[85%] rounded-2xl px-4 py-3',\n        role === 'user' && 'bg-primary rounded-tr-sm',\n        role === 'assistant' && 'rounded-tl-sm',\n        role === 'system' && 'bg-muted max-w-[95%] rounded-lg px-3 py-2',\n        className\n      )}\n      {...props}\n    >\n      {children}\n    </View>\n  );\n}\n\n// --- MessageActions ---\n\ntype MessageActionsProps = ViewProps;\n\nfunction MessageActions({ className, children, ...props }: MessageActionsProps) {\n  const { role } = useMessageContext();\n\n  return (\n    <View\n      className={cn(\n        'flex-row items-center gap-1 px-1 pt-1',\n        role === 'user' && 'flex-row-reverse',\n        className\n      )}\n      {...props}\n    >\n      {children}\n    </View>\n  );\n}\n\n// --- MessageText (convenience for simple text messages) ---\n\ntype MessageTextProps = {\n  className?: string;\n  children: string;\n};\n\nfunction MessageText({ className, children }: MessageTextProps) {\n  const { role } = useMessageContext();\n\n  return (\n    <Text\n      className={cn(\n        'text-sm',\n        role === 'user' && 'text-primary-foreground',\n        role === 'assistant' && 'text-foreground',\n        role === 'system' && 'text-muted-foreground text-center text-xs',\n        className\n      )}\n    >\n      {children}\n    </Text>\n  );\n}\n\nexport { Message, MessageContent, MessageActions, MessageText, MessageContext, useMessageContext };\nexport type { MessageProps, MessageContentProps, MessageActionsProps, MessageTextProps, MessageRole };\n"
+    },
+    {
+      "path": "lib/utils.ts",
+      "type": "registry:lib",
+      "target": "lib/utils.ts",
+      "content": "import { clsx, type ClassValue } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n"
+    }
+  ]
+}

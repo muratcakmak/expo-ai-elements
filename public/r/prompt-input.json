@@ -1,0 +1,30 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "prompt-input",
+  "type": "registry:ui",
+  "title": "PromptInput",
+  "description": "Rich chat input with send/stop buttons.",
+  "dependencies": [
+    "clsx",
+    "lucide-react-native",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://reactnativereusables.com/r/uniwind/button.json",
+    "https://reactnativereusables.com/r/uniwind/icon.json"
+  ],
+  "files": [
+    {
+      "path": "components/ai/prompt-input.tsx",
+      "type": "registry:component",
+      "target": "components/ai/prompt-input.tsx",
+      "content": "import { cn } from '@/lib/utils';\nimport { Button } from '@/components/ui/button';\nimport { Icon } from '@/components/ui/icon';\nimport { ArrowUpIcon, SquareIcon } from 'lucide-react-native';\nimport * as React from 'react';\nimport { Platform, TextInput, View, type ViewProps } from 'react-native';\n\n// --- Context ---\n\ntype PromptInputContextValue = {\n  value: string;\n  setValue: (value: string) => void;\n  isLoading: boolean;\n};\n\nconst PromptInputContext = React.createContext<PromptInputContextValue>({\n  value: '',\n  setValue: () => {},\n  isLoading: false,\n});\n\nfunction usePromptInput() {\n  return React.useContext(PromptInputContext);\n}\n\n// --- PromptInput ---\n\ntype PromptInputProps = ViewProps & {\n  value?: string;\n  onValueChange?: (value: string) => void;\n  isLoading?: boolean;\n  onSubmit?: (message: string) => void;\n  onStop?: () => void;\n  children?: React.ReactNode;\n};\n\nfunction PromptInput({\n  value: controlledValue,\n  onValueChange,\n  isLoading = false,\n  onSubmit,\n  onStop,\n  className,\n  children,\n  ...props\n}: PromptInputProps) {\n  const [internalValue, setInternalValue] = React.useState('');\n  const value = controlledValue ?? internalValue;\n  const setValue = React.useCallback(\n    (v: string) => {\n      if (onValueChange) onValueChange(v);\n      else setInternalValue(v);\n    },\n    [onValueChange]\n  );\n\n  const handleSubmit = React.useCallback(() => {\n    const trimmed = value.trim();\n    if (!trimmed || isLoading) return;\n    onSubmit?.(trimmed);\n    setValue('');\n  }, [value, isLoading, onSubmit, setValue]);\n\n  const contextValue = React.useMemo(\n    () => ({ value, setValue, isLoading }),\n    [value, setValue, isLoading]\n  );\n\n  return (\n    <PromptInputContext.Provider value={contextValue}>\n      <View\n        className={cn(\n          'border-border bg-background flex-row items-end gap-2 border-t px-4 py-3',\n          className\n        )}\n        {...props}\n      >\n        {children ?? (\n          <>\n            <PromptInputTextarea\n              onSubmitEditing={handleSubmit}\n              placeholder=\"Send a message...\"\n            />\n            {isLoading ? (\n              <PromptInputStopButton onPress={onStop} />\n            ) : (\n              <PromptInputSendButton onPress={handleSubmit} />\n            )}\n          </>\n        )}\n      </View>\n    </PromptInputContext.Provider>\n  );\n}\n\n// --- PromptInputTextarea ---\n\ntype PromptInputTextareaProps = React.ComponentProps<typeof TextInput> & {\n  maxHeight?: number;\n};\n\nfunction PromptInputTextarea({\n  className,\n  maxHeight = 120,\n  ...props\n}: PromptInputTextareaProps) {\n  const { value, setValue } = usePromptInput();\n\n  return (\n    <TextInput\n      className={cn(\n        'text-foreground placeholder:text-muted-foreground bg-secondary flex-1 rounded-2xl px-4 py-2.5 text-sm',\n        className\n      )}\n      value={value}\n      onChangeText={setValue}\n      multiline\n      textAlignVertical=\"top\"\n      style={{ maxHeight }}\n      placeholderTextColor={undefined}\n      returnKeyType={Platform.OS === 'ios' ? 'default' : 'send'}\n      blurOnSubmit={false}\n      {...props}\n    />\n  );\n}\n\n// --- PromptInputSendButton ---\n\ntype PromptInputButtonProps = {\n  onPress?: () => void;\n  className?: string;\n};\n\nfunction PromptInputSendButton({ onPress, className }: PromptInputButtonProps) {\n  const { value } = usePromptInput();\n  const disabled = !value.trim();\n\n  return (\n    <Button\n      size=\"icon\"\n      className={cn('size-10 rounded-full', className)}\n      onPress={onPress}\n      disabled={disabled}\n    >\n      <Icon as={ArrowUpIcon} className=\"text-primary-foreground size-5\" />\n    </Button>\n  );\n}\n\n// --- PromptInputStopButton ---\n\nfunction PromptInputStopButton({ onPress, className }: PromptInputButtonProps) {\n  return (\n    <Button\n      size=\"icon\"\n      variant=\"destructive\"\n      className={cn('size-10 rounded-full', className)}\n      onPress={onPress}\n    >\n      <Icon as={SquareIcon} className=\"size-4 text-white\" />\n    </Button>\n  );\n}\n\nexport {\n  PromptInput,\n  PromptInputTextarea,\n  PromptInputSendButton,\n  PromptInputStopButton,\n  PromptInputContext,\n  usePromptInput,\n};\nexport type { PromptInputProps, PromptInputTextareaProps, PromptInputButtonProps };\n"
+    },
+    {
+      "path": "lib/utils.ts",
+      "type": "registry:lib",
+      "target": "lib/utils.ts",
+      "content": "import { clsx, type ClassValue } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n"
+    }
+  ]
+}

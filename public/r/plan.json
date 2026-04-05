@@ -1,0 +1,33 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "plan",
+  "type": "registry:ui",
+  "title": "Plan",
+  "description": "Agent plan display with ordered steps and progress.",
+  "dependencies": [
+    "@rn-primitives/collapsible",
+    "clsx",
+    "lucide-react-native",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/shimmer.json",
+    "https://reactnativereusables.com/r/uniwind/button.json",
+    "https://reactnativereusables.com/r/uniwind/icon.json",
+    "https://reactnativereusables.com/r/uniwind/text.json"
+  ],
+  "files": [
+    {
+      "path": "components/ai/plan.tsx",
+      "type": "registry:component",
+      "target": "components/ai/plan.tsx",
+      "content": "import { cn } from '@/lib/utils';\nimport { Icon } from '@/components/ui/icon';\nimport { Text } from '@/components/ui/text';\nimport { Button } from '@/components/ui/button';\nimport { Shimmer } from '@/components/ai/shimmer';\nimport * as Collapsible from '@rn-primitives/collapsible';\nimport { ChevronsUpDownIcon } from 'lucide-react-native';\nimport * as React from 'react';\nimport { Pressable, View } from 'react-native';\n\n// --- Context ---\n\ntype PlanContextValue = {\n  isStreaming: boolean;\n};\n\nconst PlanContext = React.createContext<PlanContextValue | null>(null);\n\nfunction usePlan() {\n  const context = React.useContext(PlanContext);\n  if (!context) {\n    throw new Error('Plan sub-components must be used within <Plan>');\n  }\n  return context;\n}\n\n// --- Plan (root) ---\n\ntype PlanProps = {\n  isStreaming?: boolean;\n  defaultOpen?: boolean;\n  open?: boolean;\n  onOpenChange?: (open: boolean) => void;\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst Plan = React.memo(function Plan({\n  isStreaming = false,\n  defaultOpen,\n  open,\n  onOpenChange,\n  children,\n  className,\n}: PlanProps) {\n  const contextValue = React.useMemo(() => ({ isStreaming }), [isStreaming]);\n\n  return (\n    <PlanContext.Provider value={contextValue}>\n      <Collapsible.Root\n        defaultOpen={defaultOpen}\n        open={open}\n        onOpenChange={onOpenChange}\n        className={cn('border-border rounded-lg border', className)}\n      >\n        {children}\n      </Collapsible.Root>\n    </PlanContext.Provider>\n  );\n});\n\nPlan.displayName = 'Plan';\n\n// --- PlanHeader ---\n\ntype PlanHeaderProps = {\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst PlanHeader = React.memo(function PlanHeader({ children, className }: PlanHeaderProps) {\n  return (\n    <View className={cn('flex-row items-start justify-between p-4', className)}>\n      {children}\n    </View>\n  );\n});\n\nPlanHeader.displayName = 'PlanHeader';\n\n// --- PlanTitle ---\n\ntype PlanTitleProps = {\n  children: string;\n  className?: string;\n};\n\nconst PlanTitle = React.memo(function PlanTitle({ children, className }: PlanTitleProps) {\n  const { isStreaming } = usePlan();\n\n  return isStreaming ? (\n    <Shimmer className={className}>{children}</Shimmer>\n  ) : (\n    <Text className={cn('text-foreground text-lg font-semibold', className)}>{children}</Text>\n  );\n});\n\nPlanTitle.displayName = 'PlanTitle';\n\n// --- PlanDescription ---\n\ntype PlanDescriptionProps = {\n  children: string;\n  className?: string;\n};\n\nconst PlanDescription = React.memo(function PlanDescription({\n  children,\n  className,\n}: PlanDescriptionProps) {\n  const { isStreaming } = usePlan();\n\n  return isStreaming ? (\n    <Shimmer className={className}>{children}</Shimmer>\n  ) : (\n    <Text className={cn('text-muted-foreground text-sm', className)}>{children}</Text>\n  );\n});\n\nPlanDescription.displayName = 'PlanDescription';\n\n// --- PlanTrigger ---\n\ntype PlanTriggerProps = {\n  className?: string;\n};\n\nconst PlanTrigger = React.memo(function PlanTrigger({ className }: PlanTriggerProps) {\n  return (\n    <Collapsible.Trigger asChild>\n      <Pressable\n        className={cn('items-center justify-center rounded-md p-1.5', className)}\n      >\n        <Icon as={ChevronsUpDownIcon} className=\"text-muted-foreground size-4\" />\n      </Pressable>\n    </Collapsible.Trigger>\n  );\n});\n\nPlanTrigger.displayName = 'PlanTrigger';\n\n// --- PlanContent ---\n\ntype PlanContentProps = {\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst PlanContent = React.memo(function PlanContent({ children, className }: PlanContentProps) {\n  return (\n    <Collapsible.Content>\n      <View className={cn('px-4 pb-4', className)}>{children}</View>\n    </Collapsible.Content>\n  );\n});\n\nPlanContent.displayName = 'PlanContent';\n\n// --- PlanFooter ---\n\ntype PlanFooterProps = {\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst PlanFooter = React.memo(function PlanFooter({ children, className }: PlanFooterProps) {\n  return (\n    <View className={cn('border-border flex-row items-center border-t px-4 py-3', className)}>\n      {children}\n    </View>\n  );\n});\n\nPlanFooter.displayName = 'PlanFooter';\n\n// --- PlanAction ---\n\ntype PlanActionProps = {\n  children?: React.ReactNode;\n  className?: string;\n};\n\nconst PlanAction = React.memo(function PlanAction({ children, className }: PlanActionProps) {\n  return <View className={className}>{children}</View>;\n});\n\nPlanAction.displayName = 'PlanAction';\n\nexport {\n  Plan,\n  PlanHeader,\n  PlanTitle,\n  PlanDescription,\n  PlanTrigger,\n  PlanContent,\n  PlanFooter,\n  PlanAction,\n  usePlan,\n};\nexport type {\n  PlanProps,\n  PlanHeaderProps,\n  PlanTitleProps,\n  PlanDescriptionProps,\n  PlanTriggerProps,\n  PlanContentProps,\n  PlanFooterProps,\n  PlanActionProps,\n};\n"
+    },
+    {
+      "path": "lib/utils.ts",
+      "type": "registry:lib",
+      "target": "lib/utils.ts",
+      "content": "import { clsx, type ClassValue } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n"
+    }
+  ]
+}

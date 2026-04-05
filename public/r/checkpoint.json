@@ -1,0 +1,31 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "checkpoint",
+  "type": "registry:ui",
+  "title": "Checkpoint",
+  "description": "Visual divider marking conversation checkpoints.",
+  "dependencies": [
+    "clsx",
+    "lucide-react-native",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://reactnativereusables.com/r/uniwind/button.json",
+    "https://reactnativereusables.com/r/uniwind/icon.json",
+    "https://reactnativereusables.com/r/uniwind/text.json"
+  ],
+  "files": [
+    {
+      "path": "components/ai/checkpoint.tsx",
+      "type": "registry:component",
+      "target": "components/ai/checkpoint.tsx",
+      "content": "import { cn } from '@/lib/utils';\nimport { Button, type ButtonProps } from '@/components/ui/button';\nimport { Icon } from '@/components/ui/icon';\nimport { Text } from '@/components/ui/text';\nimport { Bookmark as BookmarkIcon } from 'lucide-react-native';\nimport type { LucideIcon } from 'lucide-react-native';\nimport * as React from 'react';\nimport { View, type ViewProps } from 'react-native';\n\n// ============================================================================\n// Checkpoint - Container with separator lines\n// ============================================================================\n\ntype CheckpointProps = ViewProps;\n\nconst Checkpoint = React.memo(function Checkpoint({\n  className,\n  children,\n  ...props\n}: CheckpointProps) {\n  return (\n    <View\n      className={cn('flex-row items-center gap-1 overflow-hidden', className)}\n      {...props}\n    >\n      {children}\n      <View className=\"bg-border h-px flex-1\" />\n    </View>\n  );\n});\n\nCheckpoint.displayName = 'Checkpoint';\n\n// ============================================================================\n// CheckpointIcon - Customizable icon\n// ============================================================================\n\ntype CheckpointIconProps = {\n  icon?: LucideIcon;\n  className?: string;\n  children?: React.ReactNode;\n};\n\nconst CheckpointIcon = React.memo(function CheckpointIcon({\n  icon = BookmarkIcon,\n  className,\n  children,\n}: CheckpointIconProps) {\n  if (children) {\n    return <>{children}</>;\n  }\n\n  return <Icon as={icon} className={cn('text-muted-foreground size-4 shrink-0', className)} />;\n});\n\nCheckpointIcon.displayName = 'CheckpointIcon';\n\n// ============================================================================\n// CheckpointTrigger - Tappable label button\n// ============================================================================\n\ntype CheckpointTriggerProps = Omit<ButtonProps, 'variant' | 'size'> & {\n  variant?: ButtonProps['variant'];\n  size?: ButtonProps['size'];\n};\n\nconst CheckpointTrigger = React.memo(function CheckpointTrigger({\n  children,\n  variant = 'ghost',\n  size = 'sm',\n  className,\n  ...props\n}: CheckpointTriggerProps) {\n  return (\n    <Button variant={variant} size={size} className={cn(className)} {...props}>\n      {typeof children === 'string' ? (\n        <Text className=\"text-muted-foreground text-xs font-medium\">{children}</Text>\n      ) : (\n        children\n      )}\n    </Button>\n  );\n});\n\nCheckpointTrigger.displayName = 'CheckpointTrigger';\n\nexport { Checkpoint, CheckpointIcon, CheckpointTrigger };\nexport type { CheckpointProps, CheckpointIconProps, CheckpointTriggerProps };\n"
+    },
+    {
+      "path": "lib/utils.ts",
+      "type": "registry:lib",
+      "target": "lib/utils.ts",
+      "content": "import { clsx, type ClassValue } from 'clsx';\nimport { twMerge } from 'tailwind-merge';\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n"
+    }
+  ]
+}
