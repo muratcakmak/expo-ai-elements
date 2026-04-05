@@ -2,6 +2,7 @@
   "name": "expo-ai-elements",
   "main": "expo-router/entry",
   "version": "0.1.0",
+  "license": "MIT",
   "scripts": {
     "dev": "expo start -c",
     "android": "expo start -c --android",
