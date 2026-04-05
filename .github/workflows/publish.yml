@@ -20,7 +20,7 @@ jobs:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
 
-      - run: npm publish --provenance --access public --ignore-scripts
+      - run: npm pkg delete scripts.prepare && npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
