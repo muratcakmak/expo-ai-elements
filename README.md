@@ -1,5 +1,9 @@
 # expo-ai-elements
 
+[![npm version](https://img.shields.io/npm/v/expo-ai-elements)](https://www.npmjs.com/package/expo-ai-elements)
+[![npm downloads](https://img.shields.io/npm/dm/expo-ai-elements)](https://www.npmjs.com/package/expo-ai-elements)
+[![license](https://img.shields.io/npm/l/expo-ai-elements)](https://www.npmjs.com/package/expo-ai-elements)
+
 **Open-source AI chat UI components for React Native** — bring ChatGPT-level interfaces to your mobile app in minutes.
 
 The React Native port of [Vercel AI Elements](https://elements.ai-sdk.dev). Drop-in, composable, and ready for production.
@@ -12,7 +16,7 @@ Building AI chat UIs on mobile is painful. You need streaming markdown, code blo
 
 **expo-ai-elements** gives you 25 production-ready components that handle all of this out of the box:
 
-- **Worklet-powered streaming** — markdown parsing runs on a separate thread via `react-native-streamdown`, zero jank on the UI thread
+- **Streaming markdown** — throttled native rendering with LaTeX math support
 - **Native markdown with LaTeX** — inline `$math$` and block `$$equations$$` rendered natively
 - **Copy-paste architecture** — follows the shadcn/ui pattern, you own every line of code
 - **Dark/light mode** — automatic theme support via Uniwind
@@ -86,7 +90,7 @@ import { CodeBlock, CodeBlockHeader, CodeBlockTitle, CodeBlockCopyButton, CodeBl
 | **Styling** | Uniwind (Tailwind CSS for RN) |
 | **Base UI** | React Native Reusables (shadcn/ui) |
 | **Markdown** | react-native-enriched-markdown + react-native-streamdown |
-| **Streaming** | react-native-worklets 0.8 (bundle mode) |
+| **Threading** | react-native-worklets 0.7 |
 | **AI SDK** | Vercel AI SDK (`ai` + `@ai-sdk/react`) |
 | **Animations** | react-native-reanimated 4.3 |
 | **Icons** | lucide-react-native |
@@ -111,7 +115,8 @@ lib/
 
 ## Known Limitations
 
-- **LaTeX block math** (`$$...$$`) requires `flavor="github"` on `EnrichedMarkdownText` when used directly (handled automatically by `StreamdownText`).
+- **Streaming jank**: `EnrichedMarkdownText` recalculates native layout on every prop change. Updates are throttled to ~80ms to mitigate. The proper fix (`react-native-streamdown` with worklet-based processing) requires `react-native-worklets` bundle mode which needs additional metro configuration. See [worklets bundle mode docs](https://docs.swmansion.com/react-native-worklets/docs/bundleMode/).
+- **LaTeX block math** (`$$...$$`) requires `flavor="github"` on `EnrichedMarkdownText`.
 
 ## License
 
