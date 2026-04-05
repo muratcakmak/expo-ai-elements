@@ -20,7 +20,7 @@ jobs:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
 
-      - run: npm pkg delete scripts.prepare && npm publish --provenance --access public
+      - run: npm pkg delete scripts.prepare && npm publish --access public
 
       - name: Create GitHub Release
         env:
