@@ -21,8 +21,6 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - run: npm pkg delete scripts.prepare && npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
         env:
