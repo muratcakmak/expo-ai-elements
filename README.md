@@ -8,47 +8,52 @@
 
 The React Native port of [Vercel AI Elements](https://elements.ai-sdk.dev). Drop-in, composable, and ready for production.
 
-Built with [React Native Reusables](https://reactnativereusables.com) (shadcn/ui for RN) + [Uniwind](https://uniwind.dev) (Tailwind CSS for RN).
+<p align="center">
+  <img src="assets/screenshots/dark-chat-streaming.png" width="270" alt="Chat with streaming markdown" />
+  &nbsp;&nbsp;
+  <img src="assets/screenshots/dark-streaming-latex.png" width="270" alt="Streaming LaTeX rendering" />
+  &nbsp;&nbsp;
+  <img src="assets/screenshots/dark-codeblock.png" width="270" alt="Syntax-highlighted code blocks" />
+</p>
 
-## Why expo-ai-elements?
+## Features
 
-Building AI chat UIs on mobile is painful. You need streaming markdown, code blocks with monospace fonts, LaTeX rendering, tool call displays, reasoning traces — all performing smoothly at 60fps on native.
-
-**expo-ai-elements** gives you 25 production-ready components that handle all of this out of the box:
-
-- **Streaming markdown** — throttled native rendering with LaTeX math support
-- **Native markdown with LaTeX** — inline `$math$` and block `$$equations$$` rendered natively
+- **Streaming markdown** — throttled native rendering with LaTeX math support (`$inline$` and `$$block$$`)
+- **25 production-ready components** — chat, code, reasoning, content, input, and utilities
 - **Copy-paste architecture** — follows the shadcn/ui pattern, you own every line of code
 - **Dark/light mode** — automatic theme support via Uniwind
 - **Vercel AI SDK compatible** — works with `useChat` and `useCompletion` hooks
 
-## Components
+Built with [React Native Reusables](https://reactnativereusables.com) (shadcn/ui for RN) + [Uniwind](https://uniwind.dev) (Tailwind CSS for RN).
 
-**25 components** across 6 categories:
+## Component Showcase
 
-| Category | Components |
-|---|---|
-| **Chat** | Conversation, Message, MessageResponse, Suggestion, Checkpoint, Citation, Streaming LaTeX |
-| **Code** | CodeBlock, Terminal, StackTrace, TestResults, SchemaDisplay |
-| **Reasoning** | Reasoning, ChainOfThought, Tool, Plan, Task, Agent |
-| **Content** | Artifact, FileTree, WebPreview, Attachments |
-| **Input** | PromptInput, SpeechInput, OpenInChat |
-| **Utilities** | Shimmer |
+<table>
+  <tr>
+    <td align="center"><img src="assets/screenshots/dark-chat-code.png" width="240" alt="Chat with code blocks" /><br/><b>Chat</b></td>
+    <td align="center"><img src="assets/screenshots/dark-tool.png" width="240" alt="Tool call visualization" /><br/><b>Tool Calls</b></td>
+    <td align="center"><img src="assets/screenshots/dark-reasoning.png" width="240" alt="AI reasoning trace" /><br/><b>Reasoning</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/screenshots/dark-chain-of-thought.png" width="240" alt="Chain of thought steps" /><br/><b>Chain of Thought</b></td>
+    <td align="center"><img src="assets/screenshots/dark-plan.png" width="240" alt="Agent plan with steps" /><br/><b>Plan</b></td>
+    <td align="center"><img src="assets/screenshots/dark-testresults.png" width="240" alt="Test results with progress" /><br/><b>Test Results</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/screenshots/dark-terminal.png" width="240" alt="Terminal output" /><br/><b>Terminal</b></td>
+    <td align="center"><img src="assets/screenshots/dark-filetree.png" width="240" alt="File tree component" /><br/><b>File Tree</b></td>
+    <td align="center"><img src="assets/screenshots/dark-artifact.png" width="240" alt="Code artifact container" /><br/><b>Artifact</b></td>
+  </tr>
+</table>
 
-## Installation
-
-### Prerequisites
-
-You'll need [Uniwind](https://uniwind.dev) (Tailwind CSS for React Native) and [React Native Reusables](https://reactnativereusables.com) set up in your project.
+## Quick Start
 
 ### Add Components via CLI (recommended)
 
-Add individual components using the [React Native Reusables CLI](https://reactnativereusables.com). Each command installs the component source, its npm dependencies, and any dependent components automatically:
-
 ```bash
+npx @react-native-reusables/cli@latest add https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/conversation.json
 npx @react-native-reusables/cli@latest add https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/message.json
 npx @react-native-reusables/cli@latest add https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/message-response.json
-npx @react-native-reusables/cli@latest add https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/conversation.json
 npx @react-native-reusables/cli@latest add https://raw.githubusercontent.com/muratcakmak/expo-ai-elements/main/public/r/prompt-input.json
 ```
 
@@ -56,17 +61,14 @@ Browse all available components in the [registry index](https://raw.githubuserco
 
 ### Alternative: npm package
 
-Install all components at once as a package:
-
 ```bash
 npm install expo-ai-elements
-```
-
-With the npm package, you'll also need to install peer dependencies:
-
-```bash
 npx expo install react-native-enriched-markdown react-native-reanimated react-native-gesture-handler react-native-svg lucide-react-native expo-clipboard expo-haptics
 ```
+
+### Prerequisites
+
+You'll need [Uniwind](https://uniwind.dev) (Tailwind CSS for React Native) and [React Native Reusables](https://reactnativereusables.com) set up in your project.
 
 ## Usage
 
@@ -122,24 +124,35 @@ import {
 </CodeBlock>
 ```
 
-## Running the Demo App
+## Components
+
+**25 components** across 6 categories:
+
+| Category | Components |
+|---|---|
+| **Chat** | Conversation, Message, MessageResponse, Suggestion, Checkpoint, Citation, Streaming LaTeX |
+| **Code** | CodeBlock, Terminal, StackTrace, TestResults, SchemaDisplay |
+| **Reasoning** | Reasoning, ChainOfThought, Tool, Plan, Task, Agent |
+| **Content** | Artifact, FileTree, WebPreview, Attachments |
+| **Input** | PromptInput, SpeechInput, OpenInChat |
+| **Utilities** | Shimmer |
+
+## Demo App
+
+<p align="center">
+  <img src="assets/screenshots/dark-home.png" width="270" alt="Demo app home screen" />
+  &nbsp;&nbsp;
+  <img src="assets/screenshots/dark-chat-empty.png" width="270" alt="Chat demo empty state" />
+</p>
+
+The repo includes a full demo app with interactive previews for every component plus a chat demo with simulated streaming.
 
 ```bash
-# Clone the repo
 git clone https://github.com/muratcakmak/expo-ai-elements.git
 cd expo-ai-elements
-
-# Install dependencies
 bun install
-
-# Run on iOS
-npx expo run:ios
-
-# Run on Android
-npx expo run:android
+npx expo run:ios   # or npx expo run:android
 ```
-
-The demo includes a component showcase with interactive demos for every component, plus a full chat demo with simulated streaming.
 
 ## Stack
 
