@@ -30,6 +30,9 @@
         }
       ],
       "expo-sharing"
-    ]
+    ],
+    "web": {
+      "output": "server"
+    }
   }
 }
