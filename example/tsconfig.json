@@ -1,4 +1,13 @@
 {
-  "compilerOptions": {},
+  "compilerOptions": {
+    // Force a single type identity for packages that exist in BOTH the root
+    // and example node_modules — library src (../../src) otherwise resolves
+    // the root copies, which miss uniwind's className augmentation (it lands
+    // on the example copies). Mirrors metro's singleton redirect at the type level.
+    "paths": {
+      "react": ["./node_modules/@types/react"],
+      "react-native": ["./node_modules/react-native"]
+    }
+  },
   "extends": "expo/tsconfig.base"
 }
