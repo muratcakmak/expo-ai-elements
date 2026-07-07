@@ -137,6 +137,8 @@ function AccordionItem({ children, className, value, ...props }: AccordionItemPr
 
 type AccordionTriggerProps = PressableProps & {
   className?: string;
+  // Narrow the Pressable render-prop `children` union to a plain node.
+  children?: React.ReactNode;
 };
 
 function AccordionTrigger({ children, className, ...props }: AccordionTriggerProps) {

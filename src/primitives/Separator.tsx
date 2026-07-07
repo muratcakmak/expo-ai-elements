@@ -1,4 +1,4 @@
-import { View, type ViewProps } from 'react-native';
+import { View, type AccessibilityRole, type ViewProps } from 'react-native';
 
 import { cn } from '../utils/cn';
 
@@ -21,7 +21,8 @@ function Separator({
         orientation === 'horizontal' ? 'h-px w-full' : 'h-full w-px',
         className,
       )}
-      accessibilityRole={decorative ? 'none' : 'separator' as const}
+      // RN has no ARIA "separator" role; cast keeps the semantic hint on native.
+      accessibilityRole={(decorative ? 'none' : 'separator') as AccessibilityRole}
       {...props}
     />
   );

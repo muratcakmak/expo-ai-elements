@@ -132,7 +132,8 @@ type DropdownMenuItemProps = PressableProps & {
   icon?: React.ReactNode;
   label?: string;
   variant?: 'default' | 'destructive';
-  disabled?: boolean;
+  // Align with PressableProps (RN 0.86 widened `disabled` to `boolean | null`).
+  disabled?: boolean | null;
 };
 
 function DropdownMenuItem({
@@ -167,7 +168,9 @@ function DropdownMenuItem({
           {label}
         </Text>
       ) : (
-        children
+        // Pressable's `children` may be a render fn; this menu item only ever
+        // receives plain nodes, so render it directly as a node.
+        (children as React.ReactNode)
       )}
     </Pressable>
   );

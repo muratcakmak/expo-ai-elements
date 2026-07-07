@@ -57,7 +57,7 @@ export const PromptInputAttachments = ({
 // ============================================================================
 
 type PromptInputAttachmentItemProps = {
-  file: { id: string; filename: string; mediaType: string; url: string };
+  file: { id: string; filename?: string; mediaType: string; url: string };
   thumbnailSize: number;
   onRemove: () => void;
 };
@@ -87,7 +87,7 @@ const PromptInputAttachmentItem = ({
             className="text-[10px] text-muted-foreground"
             numberOfLines={1}
           >
-            {getExtension(file.filename)}
+            {getExtension(file.filename ?? '')}
           </Text>
         </View>
       )}

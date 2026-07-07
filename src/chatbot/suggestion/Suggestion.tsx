@@ -1,5 +1,11 @@
 import React, { useCallback } from 'react';
-import { StyleSheet, View, type ViewProps, type ViewStyle } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  type StyleProp,
+  type ViewProps,
+  type ViewStyle,
+} from 'react-native';
 
 import { Button, type ButtonProps } from '../../primitives/Button';
 import { ScrollArea } from '../../primitives/ScrollArea';
@@ -55,7 +61,7 @@ export const Suggestion = ({
 
   return (
     <Button
-      style={[suggestionStyles.button, style]}
+      style={[suggestionStyles.button, style as StyleProp<ViewStyle>]}
       onPress={handlePress}
       size={size}
       variant={variant}

@@ -15,7 +15,10 @@ import {
   type TextProps,
   type ViewProps,
 } from 'react-native';
-import { usePermissions } from 'expo-audio';
+import {
+  getRecordingPermissionsAsync,
+  requestRecordingPermissionsAsync,
+} from 'expo-audio';
 import { Check, ChevronsUpDown } from 'lucide-react-native';
 
 import { cn } from '../../utils/cn';
@@ -70,26 +73,26 @@ function useAudioDevices() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState(false);
-  const [permissionResponse, requestPermission] = usePermissions();
 
   const loadDevices = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      if (!permissionResponse?.granted) {
-        const result = await requestPermission();
-        if (!result.granted) {
-          setError('Microphone permission not granted');
-          setHasPermission(false);
-          return;
-        }
+      // expo-audio (SDK 57) exposes only imperative permission APIs.
+      let permission = await getRecordingPermissionsAsync();
+      if (!permission.granted) {
+        permission = await requestRecordingPermissionsAsync();
+      }
+      if (!permission.granted) {
+        setError('Microphone permission not granted');
+        setHasPermission(false);
+        return;
       }
 
       setHasPermission(true);
 
-      // expo-audio doesn't expose device enumeration directly.
-      // Provide a default "Built-in Microphone" entry.
+      // TODO: expo-audio has no input-device enumeration API yet; hardcoded single device until it lands
       setDevices([
         { uid: 'default', name: 'Built-in Microphone', type: 'builtin' },
       ]);
@@ -102,7 +105,7 @@ function useAudioDevices() {
     } finally {
       setLoading(false);
     }
-  }, [permissionResponse, requestPermission]);
+  }, []);
 
   useEffect(() => {
     loadDevices();

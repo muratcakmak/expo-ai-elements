@@ -252,6 +252,7 @@ function SelectContent({
 type SelectItemProps = {
   value: string;
   label: string;
+  className?: string;
 };
 
 function SelectItem({

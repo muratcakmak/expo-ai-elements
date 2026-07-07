@@ -7,7 +7,7 @@ export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './
 
 export { Badge, badgeVariants, badgeTextVariants, type BadgeProps } from './Badge';
 
-export { Button, buttonVariants, type ButtonProps } from './Button';
+export { Button, type ButtonProps } from './Button';
 
 export {
   Card,
