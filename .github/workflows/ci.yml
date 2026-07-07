@@ -27,7 +27,5 @@ jobs:
       - name: Typecheck (example)
         run: cd example && bunx tsc --noEmit
 
-      # TODO: enable once eslint + eslint-config-expo are installed
-      #   bun add -d eslint eslint-config-expo
-      # - name: Lint (root)
-      #   run: bunx eslint . --max-warnings=50
+      - name: Lint (root)
+        run: bunx eslint . --max-warnings=50

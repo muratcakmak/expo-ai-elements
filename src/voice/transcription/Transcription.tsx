@@ -15,7 +15,6 @@ import {
   type PressableProps,
   type ScrollViewProps,
   type TextProps,
-  type ViewProps,
 } from 'react-native';
 
 import { cn } from '../../utils/cn';

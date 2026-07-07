@@ -13,7 +13,6 @@ import {
   View,
   type PressableProps,
   type TextProps,
-  type ViewProps,
 } from 'react-native';
 import {
   getRecordingPermissionsAsync,
@@ -22,7 +21,6 @@ import {
 import { Check, ChevronsUpDown } from 'lucide-react-native';
 
 import { cn } from '../../utils/cn';
-import { Button } from '../../primitives/Button';
 import {
   Drawer,
   DrawerContent,
@@ -108,6 +106,10 @@ function useAudioDevices() {
   }, []);
 
   useEffect(() => {
+    // Genuine on-mount side effect: requesting mic permission and enumerating
+    // devices is inherently async and must store results in state. There is no
+    // non-effect equivalent, so this is a false positive for set-state-in-effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadDevices();
   }, [loadDevices]);
 
@@ -138,7 +140,7 @@ function MicSelector({
   const [internalValue, setInternalValue] = useState<string | undefined>(
     defaultValue,
   );
-  const { devices, loading, error, loadDevices } = useAudioDevices();
+  const { devices, loading, error } = useAudioDevices();
 
   const isControlled = controlledValue !== undefined;
   const value = isControlled ? controlledValue : internalValue;

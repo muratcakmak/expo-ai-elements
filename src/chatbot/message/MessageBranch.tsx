@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { View, Text, Pressable, type ViewProps } from 'react-native';
+import { View, Text, type ViewProps } from 'react-native';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import type { ReactElement } from 'react';
 

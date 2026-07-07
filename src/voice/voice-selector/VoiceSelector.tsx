@@ -6,7 +6,6 @@ import React, {
   useState,
 } from 'react';
 import {
-  FlatList,
   Pressable,
   Text,
   View,

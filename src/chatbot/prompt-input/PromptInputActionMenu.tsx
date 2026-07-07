@@ -1,6 +1,6 @@
 import { ImageIcon, Monitor, Plus } from 'lucide-react-native';
 import { useCallback } from 'react';
-import { Pressable, Text, type PressableProps } from 'react-native';
+import { type PressableProps } from 'react-native';
 
 import {
   DropdownMenu,

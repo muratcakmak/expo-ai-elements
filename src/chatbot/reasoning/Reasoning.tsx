@@ -8,7 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { StyleSheet, View, Text, type ViewProps, type ViewStyle, type PressableProps } from 'react-native';
+import { StyleSheet, View, Text, type ViewStyle, type PressableProps } from 'react-native';
 import { ChevronDown, Brain } from 'lucide-react-native';
 
 import {

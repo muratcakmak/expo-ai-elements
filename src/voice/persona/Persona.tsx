@@ -2,7 +2,6 @@ import React, {
   memo,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -87,11 +86,9 @@ const sources = {
  */
 // `@rive-app/react-native` is an optional peer that may not be installed, so
 // it is typed loosely here to avoid a hard type-level dependency on it.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let riveModule: any = null;
 let riveLoadAttempted = false;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getRiveModule(): any {
   if (riveLoadAttempted) {
     return riveModule;
@@ -129,13 +126,11 @@ const RivePersona = memo(function RivePersona({
   onLoadError,
   onReady,
 }: RivePersonaProps) {
+  // Hooks must run unconditionally (rules-of-hooks); the `!Rive` early return
+  // is placed below all hook calls further down.
   const Rive = getRiveModule();
-  if (!Rive) {
-    return null;
-  }
 
   const colorScheme = useColorScheme();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const riveRef = useRef<any>(null);
 
   // Stabilize callbacks
@@ -178,6 +173,10 @@ const RivePersona = memo(function RivePersona({
   const handleError = useCallback((error: unknown) => {
     callbacksRef.current.onLoadError?.(error);
   }, []);
+
+  if (!Rive) {
+    return null;
+  }
 
   const RiveComponent = Rive.default;
 

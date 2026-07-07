@@ -9,7 +9,6 @@ import React, {
   useState,
 } from 'react';
 import {
-  FlatList,
   Pressable,
   ScrollView,
   Text,
@@ -28,7 +27,6 @@ import {
 import { cn } from '../../utils/cn';
 import {
   Collapsible,
-  CollapsibleTrigger,
   CollapsibleContent,
 } from '../../primitives/Collapsible';
 

@@ -9,7 +9,6 @@ import {
 import { X } from 'lucide-react-native';
 
 import { cn } from '../../utils/cn';
-import { Button, type ButtonProps } from '../../primitives/Button';
 
 /* ---------------------------------- Root ---------------------------------- */
 

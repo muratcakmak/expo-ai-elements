@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo } from 'react';
-import { Text, View, type TextProps, type ViewProps } from 'react-native';
+import { Text, View, type ViewProps } from 'react-native';
 import { ArrowRight, Minus, Package, Plus } from 'lucide-react-native';
 
 import { cn } from '../../utils/cn';

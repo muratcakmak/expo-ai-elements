@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, type ViewProps, type PressableProps } from 'react-native';
+import { View, type ViewProps } from 'react-native';
 import { BookmarkIcon } from 'lucide-react-native';
 
 import { cn } from '../../utils/cn';
 import { Button, type ButtonProps } from '../../primitives/Button';
 import { Separator } from '../../primitives/Separator';
-import { Tooltip, TooltipTrigger, TooltipContent } from '../../primitives/Tooltip';
+import { Tooltip, TooltipTrigger } from '../../primitives/Tooltip';
 
 /* ------------------------------- Checkpoint ------------------------------- */
 

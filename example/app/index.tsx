@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, Text, View, Pressable } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // ===== PRIMITIVES =====
@@ -122,7 +122,7 @@ export default function ShowcaseScreen() {
             <CollapsibleContent>
               <View style={{ padding: 12, marginTop: 8, backgroundColor: '#f9fafb', borderRadius: 8 }}>
                 <Text style={{ lineHeight: 20 }}>
-                  This content is inside a Collapsible component. It's used by 6+ other components in the library: Reasoning, Tool, Task, ChainOfThought, FileTree, and Sources.
+                  This content is inside a Collapsible component. It&apos;s used by 6+ other components in the library: Reasoning, Tool, Task, ChainOfThought, FileTree, and Sources.
                 </Text>
               </View>
             </CollapsibleContent>
@@ -160,7 +160,7 @@ export default function ShowcaseScreen() {
 
             <Message from="user">
               <MessageContent from="user">
-                <Text style={{ color: '#fff', fontSize: 14 }}>That's great! What about styling?</Text>
+                <Text style={{ color: '#fff', fontSize: 14 }}>That&apos;s great! What about styling?</Text>
               </MessageContent>
             </Message>
 

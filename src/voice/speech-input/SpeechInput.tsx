@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, View, type PressableProps } from 'react-native';
+import { Animated, View, type PressableProps } from 'react-native';
 import {
   ExpoSpeechRecognitionModule,
   useSpeechRecognitionEvent,
@@ -50,8 +50,10 @@ const detectSpeechInputMode = (): SpeechInputMode => {
 /* ------------------------------ PulseRing -------------------------------- */
 
 const PulseRing = ({ delay }: { delay: number }) => {
-  const opacity = useRef(new Animated.Value(0.4)).current;
-  const scale = useRef(new Animated.Value(1)).current;
+  // Lazily create stable Animated.Values via useState so we never read a ref
+  // during render (react-hooks/refs).
+  const [opacity] = useState(() => new Animated.Value(0.4));
+  const [scale] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     const animation = Animated.loop(
@@ -104,9 +106,11 @@ function SpeechInput({
   const onTranscriptionChangeRef = useRef(onTranscriptionChange);
   const onAudioRecordedRef = useRef(onAudioRecorded);
 
-  // Keep refs in sync
-  onTranscriptionChangeRef.current = onTranscriptionChange;
-  onAudioRecordedRef.current = onAudioRecorded;
+  // Keep refs in sync after each render (refs must not be mutated during render).
+  useEffect(() => {
+    onTranscriptionChangeRef.current = onTranscriptionChange;
+    onAudioRecordedRef.current = onAudioRecorded;
+  });
 
   /* ---- expo-speech-recognition event hooks ---- */
 

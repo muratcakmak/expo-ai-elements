@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, Pressable, Linking, type ViewProps, type PressableProps } from 'react-native';
+import { Text, Linking, type ViewProps, type PressableProps } from 'react-native';
 
 import { cn } from '../../utils/cn';
 import { Button } from '../../primitives/Button';

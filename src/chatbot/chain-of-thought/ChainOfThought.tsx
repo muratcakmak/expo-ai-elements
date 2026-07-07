@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { View, Text, Image, type ViewProps } from 'react-native';
+import { View, Text, type ViewProps } from 'react-native';
 import { BrainIcon, ChevronDownIcon, DotIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 
