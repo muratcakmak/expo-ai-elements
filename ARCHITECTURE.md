@@ -2,7 +2,7 @@
 
 ## Full-Parity React Native Rebuild of Vercel AI Elements
 
-**Target Stack:** Expo SDK 55 (dev client) · Uniwind (Tailwind CSS v4) · React Native New Architecture (Fabric)
+**Target Stack:** Expo SDK 57 (dev client) · Uniwind (Tailwind CSS v4) · React Native New Architecture (Fabric)
 
 ---
 
@@ -16,8 +16,8 @@ The web AI Elements library exports **55+ components** across 5 categories. Ever
 |---|---|---|
 | **Conversation** | Rewrite → `ScrollView`/`FlashList` with stick-to-bottom behavior | `@shopify/flash-list`, `react-native-reanimated` for scroll animation |
 | **ConversationContent** | Rewrite → inner content wrapper | `View` with Uniwind className |
-| **ConversationEmptyState** | Rewrite → simple View/Text composition | `View`, `Text`, `MotiView` for fade-in |
-| **ConversationScrollButton** | Rewrite → floating `Pressable` with animated show/hide | `Pressable`, `MotiView` |
+| **ConversationEmptyState** | Rewrite → simple View/Text composition | `View`, `Text`, `Animated` for fade-in |
+| **ConversationScrollButton** | Rewrite → floating `Pressable` with animated show/hide | `Pressable`, `Animated` |
 | **ConversationDownload** | Rewrite → Share sheet integration | `expo-sharing`, `expo-file-system` |
 | **Message** | Rewrite → View wrapper with role-based styling | `View` with Uniwind variants |
 | **MessageContent** | Rewrite → content container | `View` |
@@ -27,9 +27,9 @@ The web AI Elements library exports **55+ components** across 5 categories. Ever
 | **MessageBranch** + sub-components (5) | Rewrite → branch navigation UI | `View`, `Pressable`, `Text` with swipe gesture support via `react-native-gesture-handler` |
 | **MessageToolbar** | Rewrite → toolbar container | `View` |
 | **PromptInput** (+ 30 sub-components) | Rewrite → composable input system | See Section 2.1 |
-| **Reasoning** | Rewrite → collapsible thinking block | `react-native-collapsible` or custom `MotiView` |
-| **ChainOfThought** | Rewrite → step-by-step expandable list | `FlatList` + `MotiView` |
-| **Shimmer** | Rewrite → skeleton loading | `react-native-skeleton-placeholder` or `MotiView` shimmer |
+| **Reasoning** | Rewrite → collapsible thinking block | `react-native-collapsible` or custom `Animated` |
+| **ChainOfThought** | Rewrite → step-by-step expandable list | `FlatList` + `Animated` |
+| **Shimmer** | Rewrite → skeleton loading | `react-native-skeleton-placeholder` or `Animated` shimmer |
 | **Sources** / **InlineCitation** | Rewrite → tappable citation chips | `Pressable`, `Linking` |
 | **Suggestion** | Rewrite → tappable suggestion pills | `ScrollView` horizontal + `Pressable` |
 | **ModelSelector** | Rewrite → bottom sheet selector | `@gorhom/bottom-sheet` |
@@ -38,16 +38,16 @@ The web AI Elements library exports **55+ components** across 5 categories. Ever
 | **Confirmation** | Rewrite → approval dialog | `Modal` or `@gorhom/bottom-sheet` |
 | **Context** | Rewrite → context display | `View`, `Text` |
 | **Plan** | Rewrite → plan step display | `FlatList` + status icons |
-| **Task** + sub-components (5) | Rewrite → collapsible task list | `Pressable`, `MotiView` for collapse animation |
+| **Task** + sub-components (5) | Rewrite → collapsible task list | `Pressable`, `Animated` for collapse animation |
 | **Tool** + sub-components (5) | Rewrite → collapsible tool invocation display | Same pattern as Task |
-| **Attachments** + sub-components (9) | Rewrite → file/image/video/audio attachment display | `expo-image`, `expo-video`, `expo-audio`, `Pressable` for remove, long-press popover for preview |
+| **Attachments** + sub-components (9) | Rewrite → file/image/video/audio attachment display | `expo-image`, `expo-audio`, `Pressable` for remove, long-press popover for preview |
 
 ### 1.2 Code Components (15)
 
 | Web Component | RN Strategy | Key RN Primitives / Libraries |
 |---|---|---|
 | **CodeBlock** | Rewrite → syntax-highlighted code view | **WebView + shiki** (pre-rendered HTML) or `react-native-syntax-highlighter` |
-| **Agent** | Rewrite → agent status/activity display | `View`, `Text`, `MotiView` |
+| **Agent** | Rewrite → agent status/activity display | `View`, `Text`, `Animated` |
 | **Artifact** | Rewrite → artifact preview card | `View`, `Image`, `Pressable` |
 | **Commit** | Rewrite → commit info display | `View`, `Text`, icons |
 | **EnvironmentVariables** | Rewrite → key-value display with masking | `FlatList`, `Text` |
@@ -66,8 +66,8 @@ The web AI Elements library exports **55+ components** across 5 categories. Ever
 
 | Web Component | RN Strategy | Key RN Primitives / Libraries |
 |---|---|---|
-| **AudioPlayer** | Rewrite → custom audio player UI | `expo-audio` (SDK 55) + custom controls via `Pressable` + `Slider` |
-| **MicSelector** | Rewrite → audio input device picker | `expo-av` audio input APIs + `@gorhom/bottom-sheet` |
+| **AudioPlayer** | Rewrite → custom audio player UI | `expo-audio` (SDK 57) + custom controls via `Pressable` + `Slider` |
+| **MicSelector** | Rewrite → audio input device picker | `expo-audio` device APIs + `@gorhom/bottom-sheet` |
 | **Persona** | Rewrite → avatar/persona display | `Image`, `View` |
 | **SpeechInput** | Rewrite → speech-to-text input | `expo-speech-recognition` or `@react-native-voice/voice` |
 | **Transcription** | Rewrite → live transcription display | `Text` with streaming updates |
@@ -300,14 +300,14 @@ FlowCanvas (Skia Canvas + GestureDetector)
 | `shadcn/ui` + Radix UI | Custom components with Uniwind | Full rewrite of all primitives |
 | `lucide-react` | `lucide-react-native` | Drop-in SVG icon swap |
 | `@xyflow/react` | `@shopify/react-native-skia` + custom | See Section 2.5 |
-| `media-chrome` | `expo-audio` / `expo-video` + custom controls | See Voice section |
+| `media-chrome` | `expo-audio` + custom controls | See Voice section |
 | `ansi-to-react` | Custom ANSI parser → `Text` spans | See Section 2.4 |
 | `streamdown` / `@streamdown/*` | `react-native-streamdown` | Software Mansion's native equivalent |
 | `shiki` | `react-native-syntax-highlighter` (or WebView+shiki) | See Section 2.2 |
 | `katex` | `react-native-enriched-markdown` (built-in LaTeX) | Native rendering, no WebView |
 | `react-jsx-parser` | `react-native-webview` (sandboxed) | For JSXPreview component |
 | Tailwind CSS | **Uniwind** | Build-time compiled, className prop |
-| `motion` (Framer Motion) | **Moti** + `react-native-reanimated` v3 | Mount/unmount animations, 60fps native thread |
+| `motion` (Framer Motion) | React Native `Animated` (core) | Mount/unmount animations, native thread |
 | `class-variance-authority` | Uniwind variants or custom utility | CVA patterns adapted for RN |
 | `react-resizable-panels` | `react-native-gesture-handler` drag | Custom implementation |
 | `stick-to-bottom` | Custom `ScrollView` / `FlashList` with `onContentSizeChange` | Auto-scroll behavior |
@@ -326,8 +326,7 @@ FlowCanvas (Skia Canvas + GestureDetector)
 | Library | Purpose | Expo Compatible |
 |---|---|---|
 | `uniwind` | Tailwind CSS v4 styling | Yes (Expo Go + dev client) |
-| `react-native-reanimated` v3 | Animation engine | Yes |
-| `moti` | Framer Motion-style animation API | Yes |
+| `react-native-reanimated` v4 | Animation engine | Yes |
 | `react-native-gesture-handler` | Touch/gesture handling | Yes |
 | `@shopify/flash-list` or `LegendList` | Performant message list | Yes |
 | `@gorhom/bottom-sheet` | Bottom sheets (selectors, menus) | Yes |
@@ -341,7 +340,6 @@ FlowCanvas (Skia Canvas + GestureDetector)
 | `expo-image-picker` | Image attachments | Yes |
 | `expo-sharing` | Share/download conversations | Yes |
 | `expo-audio` | Audio playback | Yes |
-| `expo-video` | Video playback (SDK 55) | Yes |
 | `expo-speech-recognition` | Speech-to-text | Yes (dev client) |
 | `lucide-react-native` | Icons | Yes |
 | `react-native-syntax-highlighter` | Code block highlighting | Yes |
@@ -598,7 +596,9 @@ Dark mode works automatically via Uniwind's `dark:` variant.
 
 ---
 
-## 6. Animation Architecture (Moti + Reanimated)
+## 6. Animation Architecture (React Native Animated)
+
+> The shipped components implement these transitions with React Native's core `Animated` API (see `src/chatbot/shimmer/Shimmer.tsx` and `src/voice/speech-input/SpeechInput.tsx`). The Moti-style snippets below are retained from the original plan to illustrate the intended enter/exit/loop behavior; Moti is not a dependency.
 
 ### 6.1 Core Patterns
 
@@ -778,6 +778,6 @@ For smooth streaming text without jank:
 2. **Streaming Performance:** Streaming markdown renders at 60fps with zero JS thread blocking
 3. **Theming:** Full theme customization via Uniwind CSS variables
 4. **Type Safety:** 100% TypeScript with exported type definitions
-5. **Expo Compatibility:** Works with Expo SDK 55+ (dev client for native modules)
+5. **Expo Compatibility:** Works with Expo SDK 57+ (dev client for native modules)
 6. **Bundle Size:** Tree-shakeable — importing one component doesn't pull in the entire library
 7. **Accessibility:** VoiceOver (iOS) and TalkBack (Android) support for all interactive components

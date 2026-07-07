@@ -1,6 +1,6 @@
 # expo-ai-elements
 
-React Native port of Vercel AI Elements. 48 components for Expo SDK 55.
+React Native port of Vercel AI Elements. 48 components for Expo SDK 57.
 
 ## Rules
 
@@ -13,22 +13,25 @@ React Native port of Vercel AI Elements. 48 components for Expo SDK 55.
 
 ## Project Structure
 
-- `src/` — Library source (119 files, 48 components)
+This repo is a **pure library** — there is no root app. `example/` is the runnable app.
+
+- `src/` — Library source (48 components)
 - `src/primitives/` — RN equivalents of shadcn-ui (Button, Collapsible, Select, etc.)
 - `src/chatbot/` — Chat components (Conversation, Message, PromptInput, etc.)
 - `src/code/` — Code display (CodeBlock, Terminal, FileTree, etc.)
 - `src/voice/` — Voice/media (AudioPlayer, SpeechInput, etc.)
 - `src/workflow/` — Flow graph (Canvas via WebView)
 - `src/utilities/` — Image, OpenInChat
-- `example/` — Expo Router example app
+- `example/` — Expo Router example app (the runnable app)
 
 ## Key Deps
 
-- Expo SDK 55 (React 19.2.0, RN 0.83.2)
+- Expo SDK 57 (React 19.2.3, RN 0.86.0)
 - Uniwind (Tailwind CSS v4 for RN)
-- Moti + Reanimated 4.x (animations)
+- react-native-reanimated 4.x + react-native-worklets (bundle mode)
+- react-native-streamdown 0.2 (streaming markdown)
 - @gorhom/bottom-sheet (overlays)
-- expo-audio, expo-av, expo-clipboard, expo-image, expo-document-picker
+- expo-audio, expo-clipboard, expo-image, expo-document-picker
 
 ## Running
 
