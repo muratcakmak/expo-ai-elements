@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, type ViewProps } from 'react-native';
-import { WebView, type WebViewMessageEvent } from '../../../utils/webview-shim';
+import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 
 import { cn } from '../../utils/cn';
 

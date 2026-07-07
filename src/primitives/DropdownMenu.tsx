@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, Text, Pressable, type ViewProps, type PressableProps } from 'react-native';
-import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from './bottom-sheet-shim';
+import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 
 import { cn } from '../utils/cn';
 

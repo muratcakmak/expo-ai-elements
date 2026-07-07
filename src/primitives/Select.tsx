@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import BottomSheet, {
   BottomSheetFlatList,
-} from './bottom-sheet-shim';
+} from '@gorhom/bottom-sheet';
 import { Check, ChevronDown } from 'lucide-react-native';
 
 import { cn } from '../utils/cn';

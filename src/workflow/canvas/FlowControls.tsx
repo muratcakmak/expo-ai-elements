@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, type ViewProps } from 'react-native';
-import type { WebView } from '../../../utils/webview-shim';
+import type { WebView } from 'react-native-webview';
 
 import { cn } from '../../utils/cn';
 import { Button, type ButtonProps } from '../../primitives/Button';

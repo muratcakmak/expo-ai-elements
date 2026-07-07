@@ -4,7 +4,11 @@
     "slug": "expo-ai-elements-example",
     "version": "1.0.0",
     "scheme": "expo-ai-elements-example",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "ios": {
       "bundleIdentifier": "com.example.expoaielements"
     },
@@ -12,7 +16,8 @@
       "package": "com.example.expoaielements"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "@react-native-community/datetimepicker"
     ]
   }
 }

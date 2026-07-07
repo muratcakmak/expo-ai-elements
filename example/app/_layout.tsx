@@ -1,19 +1,20 @@
-// Polyfills — wrap in try/catch for Expo Go compatibility
-try { require('@ungap/structured-clone'); } catch {}
-try { require('@stardazed/streams-text-encoding'); } catch {}
+import "../global.css";
 
 import { Stack } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Stack
-        screenOptions={{
-          headerTitle: 'AI Chat',
-          headerLargeTitle: false,
-        }}
-      />
+      <BottomSheetModalProvider>
+        <Stack
+          screenOptions={{
+            headerTitle: 'AI Chat',
+            headerLargeTitle: false,
+          }}
+        />
+      </BottomSheetModalProvider>
     </GestureHandlerRootView>
   );
 }

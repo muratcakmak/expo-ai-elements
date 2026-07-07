@@ -15,7 +15,7 @@ import {
   type TextProps,
   type ViewProps,
 } from 'react-native';
-import * as ExpoAv from 'expo-av';
+import { usePermissions } from 'expo-audio';
 import { Check, ChevronsUpDown } from 'lucide-react-native';
 
 import { cn } from '../../utils/cn';
@@ -62,62 +62,37 @@ function useMicSelector(): MicSelectorContextValue {
 /* ------------------------------ Hook -------------------------------------- */
 
 /**
- * Hook to enumerate available audio input devices using expo-av.
- * Requests microphone permission and retrieves the list of audio inputs.
+ * Hook to enumerate available audio input devices using expo-audio.
+ * Requests microphone permission. Device enumeration is platform-limited.
  */
 function useAudioDevices() {
   const [devices, setDevices] = useState<AudioInputDevice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState(false);
+  const [permissionResponse, requestPermission] = usePermissions();
 
   const loadDevices = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Request microphone permission
-      const { status } = await ExpoAv.Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
-        setError('Microphone permission not granted');
-        setHasPermission(false);
-        return;
+      if (!permissionResponse?.granted) {
+        const result = await requestPermission();
+        if (!result.granted) {
+          setError('Microphone permission not granted');
+          setHasPermission(false);
+          return;
+        }
       }
 
       setHasPermission(true);
 
-      // Get available audio inputs via Recording API
-      // expo-av exposes available inputs through the audio session
-      await ExpoAv.Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-
-      const recording = new ExpoAv.Audio.Recording();
-      await recording.prepareToRecordAsync(
-        ExpoAv.Audio.RecordingOptionsPresets.HIGH_QUALITY,
-      );
-
-      const availableInputs = await recording.getAvailableInputs();
-
-      const audioInputs: AudioInputDevice[] = availableInputs.map(
-        (input) => ({
-          uid: input.uid,
-          name: input.name,
-          type: input.type,
-        }),
-      );
-
-      setDevices(audioInputs);
-
-      // Clean up the temporary recording
-      await recording.stopAndUnloadAsync();
-
-      // Restore audio mode
-      await ExpoAv.Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
-      });
+      // expo-audio doesn't expose device enumeration directly.
+      // Provide a default "Built-in Microphone" entry.
+      setDevices([
+        { uid: 'default', name: 'Built-in Microphone', type: 'builtin' },
+      ]);
     } catch (caughtError) {
       const message =
         caughtError instanceof Error
@@ -127,7 +102,7 @@ function useAudioDevices() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [permissionResponse, requestPermission]);
 
   useEffect(() => {
     loadDevices();

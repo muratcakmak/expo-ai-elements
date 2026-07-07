@@ -13,7 +13,7 @@ import {
   View,
   type ViewProps,
 } from 'react-native';
-import { WebView, type WebViewMessageEvent } from '../../utils/webview-shim';
+import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import { AlertCircle } from 'lucide-react-native';
 
 import { cn } from '../../utils/cn';

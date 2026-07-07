@@ -5,7 +5,7 @@ import {
   View,
   type ViewProps,
 } from 'react-native';
-import { WebView } from '../../utils/webview-shim';
+import { WebView } from 'react-native-webview';
 import { Code } from 'lucide-react-native';
 
 import { cn } from '../../utils/cn';
