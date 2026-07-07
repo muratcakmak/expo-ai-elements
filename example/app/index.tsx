@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Link } from 'expo-router';
 
 // ===== PRIMITIVES =====
 import { Button } from '../../src/primitives/Button';
@@ -14,6 +15,44 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../../src/p
 // ===== CHAT =====
 import { Message, MessageContent } from '../../src/chatbot/message/Message';
 import { MessageToolbar } from '../../src/chatbot/message/MessageToolbar';
+
+const NAV_ROUTES = [
+  { href: '/markdown', label: 'markdown' },
+  { href: '/sheets', label: 'sheets' },
+  { href: '/chat', label: 'chat' },
+  { href: '/code', label: 'code' },
+  { href: '/voice', label: 'voice' },
+  { href: '/storybook', label: 'storybook' },
+  { href: '/smoke', label: 'smoke' },
+] as const;
+
+function NavRow() {
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{ gap: 8, paddingBottom: 4 }}
+      style={{ marginBottom: 20 }}
+    >
+      {NAV_ROUTES.map((route) => (
+        <Link key={route.href} href={route.href} asChild>
+          <Pressable
+            style={{
+              backgroundColor: '#111',
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderRadius: 999,
+            }}
+          >
+            <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>
+              {route.label}
+            </Text>
+          </Pressable>
+        </Link>
+      ))}
+    </ScrollView>
+  );
+}
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -31,7 +70,9 @@ export default function ShowcaseScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }} edges={['bottom']}>
       <ScrollView contentContainerStyle={{ padding: 20 }}>
         <Text style={{ fontSize: 28, fontWeight: '900', marginBottom: 4 }}>expo-ai-elements</Text>
-        <Text style={{ fontSize: 14, color: '#6b7280', marginBottom: 24 }}>Component Showcase</Text>
+        <Text style={{ fontSize: 14, color: '#6b7280', marginBottom: 12 }}>Component Showcase</Text>
+
+        <NavRow />
 
         {/* ===== BUTTONS ===== */}
         <Section title="Button">

@@ -13,7 +13,16 @@ export default function RootLayout() {
             headerTitle: 'AI Chat',
             headerLargeTitle: false,
           }}
-        />
+        >
+          <Stack.Screen name="index" options={{ title: 'AI Elements' }} />
+          <Stack.Screen name="markdown" options={{ title: 'Markdown' }} />
+          <Stack.Screen name="sheets" options={{ title: 'Sheets' }} />
+          <Stack.Screen name="chat" options={{ title: 'Mock Chat' }} />
+          <Stack.Screen name="code" options={{ title: 'Code' }} />
+          <Stack.Screen name="voice" options={{ title: 'Voice' }} />
+          <Stack.Screen name="storybook" options={{ title: 'Storybook' }} />
+          <Stack.Screen name="smoke" options={{ title: 'Smoke' }} />
+        </Stack>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>
   );

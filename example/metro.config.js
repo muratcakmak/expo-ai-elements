@@ -1,6 +1,7 @@
 const { getDefaultConfig } = require('expo/metro-config');
 const { withUniwindConfig } = require('uniwind/metro');
 const { getBundleModeMetroConfig } = require('react-native-worklets/bundleMode');
+const { resolve: metroResolve } = require('metro-resolver');
 const path = require('path');
 
 let config = getDefaultConfig(__dirname);
@@ -33,6 +34,19 @@ const singletonModules = [
   'react-native-streamdown',
   'react-native-enriched-markdown',
   'remend',
+  // Native modules the library source imports — same dual-copy hazard
+  '@react-native-community/slider',
+  '@react-native-community/datetimepicker',
+  'expo-audio',
+  'expo-clipboard',
+  'expo-image',
+  'expo-image-picker',
+  'expo-document-picker',
+  'expo-speech-recognition',
+  'expo-linking',
+  'expo-font',
+  'expo-constants',
+  'expo-file-system',
 ];
 config.resolver.extraNodeModules = Object.fromEntries(
   singletonModules.map((name) => [name, path.resolve(__dirname, 'node_modules', name)]),
@@ -43,23 +57,23 @@ config.resolver.extraNodeModules = Object.fromEntries(
 // resolveRequest below re-anchors singleton imports at the example app so the
 // standard resolver picks the example/node_modules copy.
 
-// worklets bundle mode (react-native-streamdown requirement)
-config.watchFolders.push(path.resolve(__dirname, 'node_modules/react-native-worklets/.worklets'));
 const defaultResolver = config.resolver.resolveRequest;
-config = getBundleModeMetroConfig(config);
-const bundleModeResolver = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
-  if (moduleName.startsWith('react-native-worklets/.worklets/')) {
-    return bundleModeResolver(context, moduleName, platform);
-  }
   // Force singleton modules (and their subpath imports) to the example app's
   // copy by re-running standard resolution anchored inside the example dir.
   const isSingleton = singletonModules.some(
     (name) => moduleName === name || moduleName.startsWith(`${name}/`),
   );
   if (isSingleton) {
-    return context.resolveRequest(
-      { ...context, originModulePath: path.join(__dirname, 'package.json') },
+    // Resolve with metro-resolver directly (custom chain stripped): re-entering
+    // context.resolveRequest from INSIDE the bundle-mode wrapper resolves
+    // against the wrong inner resolver.
+    return metroResolve(
+      {
+        ...context,
+        originModulePath: path.join(__dirname, 'package.json'),
+        resolveRequest: undefined,
+      },
       moduleName,
       platform,
     );
@@ -68,4 +82,39 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
   return context.resolveRequest(context, moduleName, platform);
 };
 
-module.exports = withUniwindConfig(config, { cssEntryFile: './global.css' });
+// worklets bundle mode (required by react-native-streamdown; captures the
+// singleton redirect above as its inner fallback resolver)
+config.watchFolders.push(path.resolve(__dirname, 'node_modules/react-native-worklets/.worklets'));
+config = getBundleModeMetroConfig(config);
+
+// uniwind wraps next (redirects app 'react-native' imports to its className
+// wrapper components)
+config = withUniwindConfig(config, { cssEntryFile: './global.css' });
+
+// OUTERMOST — arbitrate the two react-native shims. Both uniwind and worklets
+// bundle mode rewrite 'react-native' imports and each only exempts itself, so
+// uniwind's wrapper components would receive the worklets shim, whose own
+// 'react-native' import would receive uniwind's wrapper again -> infinite
+// require cycle ("Maximum call stack size exceeded" at startup). Break the
+// cycle at uniwind's internal link: uniwind's own modules always get the REAL
+// react-native.
+const composedResolver = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (
+    moduleName === 'react-native' &&
+    context.originModulePath.includes(`${path.sep}node_modules${path.sep}uniwind${path.sep}`)
+  ) {
+    return metroResolve(
+      {
+        ...context,
+        originModulePath: path.join(__dirname, 'package.json'),
+        resolveRequest: undefined,
+      },
+      moduleName,
+      platform,
+    );
+  }
+  return composedResolver(context, moduleName, platform);
+};
+
+module.exports = config;

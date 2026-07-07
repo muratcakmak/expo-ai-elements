@@ -2,7 +2,7 @@ import { useChat, type UseChatOptions } from '@ai-sdk/react';
 import { DefaultChatTransport, type UIMessage } from 'ai';
 import { fetch as expoFetch } from 'expo/fetch';
 
-import { generateAPIUrl } from '@/utils/generateAPIUrl';
+import { generateAPIUrl } from '../utils/generateAPIUrl';
 
 export type UseStreamingChatOptions<UI_MESSAGE extends UIMessage = UIMessage> =
   UseChatOptions<UI_MESSAGE> & {
