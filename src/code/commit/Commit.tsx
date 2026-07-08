@@ -1,7 +1,6 @@
 import React, {
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -229,15 +228,9 @@ const CommitTimestamp = ({
   children,
   ...props
 }: CommitTimestampProps) => {
-  const [formatted, setFormatted] = useState('');
-
-  const updateFormatted = useCallback(() => {
-    setFormatted(formatRelativeDate(date));
-  }, [date]);
-
-  useEffect(() => {
-    updateFormatted();
-  }, [updateFormatted]);
+  // Derived directly from `date` during render — no effect/state needed, which
+  // avoids the setState-in-effect cascading render.
+  const formatted = formatRelativeDate(date);
 
   return (
     <View className={cn(className)} {...props}>

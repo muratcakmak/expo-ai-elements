@@ -23,7 +23,7 @@ export const ConversationDownload = ({
 }: ConversationDownloadProps) => {
   const handlePress = useCallback(async () => {
     try {
-      const FileSystem = await import('expo-file-system');
+      const FileSystem = await import('expo-file-system/legacy');
       const Sharing = await import('expo-sharing');
 
       const markdown = messagesToMarkdown(messages, formatMessage);

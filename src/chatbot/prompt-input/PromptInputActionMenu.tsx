@@ -1,6 +1,6 @@
 import { ImageIcon, Monitor, Plus } from 'lucide-react-native';
 import { useCallback } from 'react';
-import { Pressable, Text, type PressableProps } from 'react-native';
+import { type PressableProps } from 'react-native';
 
 import {
   DropdownMenu,
@@ -83,7 +83,8 @@ export const PromptInputActionMenuItem = ({
 // PromptInputActionAddAttachments — opens document picker
 // ============================================================================
 
-export type PromptInputActionAddAttachmentsProps = PressableProps & {
+// Omit children: forwarded into DropdownMenuItem (plain-node children only).
+export type PromptInputActionAddAttachmentsProps = Omit<PressableProps, 'children'> & {
   className?: string;
   label?: string;
   accept?: string;
@@ -127,7 +128,7 @@ export const PromptInputActionAddAttachments = ({
 // PromptInputActionAddScreenshot — uses expo-screen-capture
 // ============================================================================
 
-export type PromptInputActionAddScreenshotProps = PressableProps & {
+export type PromptInputActionAddScreenshotProps = Omit<PressableProps, 'children'> & {
   className?: string;
   label?: string;
   iconSize?: number;

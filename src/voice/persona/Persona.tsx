@@ -2,7 +2,6 @@ import React, {
   memo,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -85,10 +84,12 @@ const sources = {
  * Returns null if the package is not installed, allowing fallback to
  * a static image. This avoids a hard dependency on the Rive package.
  */
-let riveModule: typeof import('@rive-app/react-native') | null = null;
+// `@rive-app/react-native` is an optional peer that may not be installed, so
+// it is typed loosely here to avoid a hard type-level dependency on it.
+let riveModule: any = null;
 let riveLoadAttempted = false;
 
-function getRiveModule(): typeof import('@rive-app/react-native') | null {
+function getRiveModule(): any {
   if (riveLoadAttempted) {
     return riveModule;
   }
@@ -125,13 +126,12 @@ const RivePersona = memo(function RivePersona({
   onLoadError,
   onReady,
 }: RivePersonaProps) {
+  // Hooks must run unconditionally (rules-of-hooks); the `!Rive` early return
+  // is placed below all hook calls further down.
   const Rive = getRiveModule();
-  if (!Rive) {
-    return null;
-  }
 
   const colorScheme = useColorScheme();
-  const riveRef = useRef<InstanceType<typeof Rive.default> | null>(null);
+  const riveRef = useRef<any>(null);
 
   // Stabilize callbacks
   const callbacksRef = useRef({ onLoad, onLoadError, onReady });
@@ -173,6 +173,10 @@ const RivePersona = memo(function RivePersona({
   const handleError = useCallback((error: unknown) => {
     callbacksRef.current.onLoadError?.(error);
   }, []);
+
+  if (!Rive) {
+    return null;
+  }
 
   const RiveComponent = Rive.default;
 

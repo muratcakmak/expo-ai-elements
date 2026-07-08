@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Pressable, type ViewProps, type PressableProps } from 'react-native';
+import { View, type ViewProps, type PressableProps } from 'react-native';
 import { ChevronDownIcon } from 'lucide-react-native';
 
 import { cn } from '../utils/cn';
@@ -137,6 +137,8 @@ function AccordionItem({ children, className, value, ...props }: AccordionItemPr
 
 type AccordionTriggerProps = PressableProps & {
   className?: string;
+  // Narrow the Pressable render-prop `children` union to a plain node.
+  children?: React.ReactNode;
 };
 
 function AccordionTrigger({ children, className, ...props }: AccordionTriggerProps) {

@@ -2,13 +2,10 @@ import React, {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import {
-  Pressable,
   Text,
   View,
   type PressableProps,
@@ -273,19 +270,21 @@ function AudioPlayerTimeRange({
   ...props
 }: AudioPlayerTimeRangeProps) {
   const { player, status } = useAudioPlayerContext();
-  const isSeeking = useRef(false);
+  // State (not a ref) so the render reads a value that actually triggers
+  // re-renders, and the slider becomes uncontrolled the moment a drag starts.
+  const [isSeeking, setIsSeeking] = useState(false);
 
   const currentSec = status.currentTime / 1000;
   const durationSec = status.duration / 1000;
 
   const handleSlidingStart = useCallback(() => {
-    isSeeking.current = true;
+    setIsSeeking(true);
   }, []);
 
   const handleSlidingComplete = useCallback(
     (value: number) => {
       player.seekTo(value);
-      isSeeking.current = false;
+      setIsSeeking(false);
     },
     [player],
   );
@@ -295,7 +294,7 @@ function AudioPlayerTimeRange({
       <Slider
         minimumValue={0}
         maximumValue={durationSec > 0 ? durationSec : 1}
-        value={isSeeking.current ? undefined : currentSec}
+        value={isSeeking ? undefined : currentSec}
         onSlidingStart={handleSlidingStart}
         onSlidingComplete={handleSlidingComplete}
         minimumTrackTintColor={minimumTrackTintColor}
@@ -407,6 +406,9 @@ function AudioPlayerVolumeRange({
   const handleValueChange = useCallback(
     (value: number) => {
       setVolume(value);
+      // expo-audio's player is a mutable imperative object; assigning `.volume`
+      // is its public API, not a React value mutation.
+      // eslint-disable-next-line react-hooks/immutability
       player.volume = value;
     },
     [player],

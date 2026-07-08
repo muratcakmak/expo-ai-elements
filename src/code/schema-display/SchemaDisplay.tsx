@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import {
-  Pressable,
   Text,
   View,
   type ViewProps,

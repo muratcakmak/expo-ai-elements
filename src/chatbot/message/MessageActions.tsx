@@ -1,11 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, Text, type ViewProps, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type ViewProps, type ViewStyle } from 'react-native';
 
 import { Button, type ButtonProps } from '../../primitives/Button';
 import {
   Tooltip,
   TooltipTrigger,
-  TooltipContent,
 } from '../../primitives/Tooltip';
 
 /* ------------------------------- MessageActions ------------------------------ */

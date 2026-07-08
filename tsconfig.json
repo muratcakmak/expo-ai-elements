@@ -12,7 +12,6 @@
     "isolatedModules": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"
@@ -21,7 +20,8 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.tsx",
+    "uniwind-types.d.ts"
   ],
   "exclude": [
     "node_modules"

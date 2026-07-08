@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View, type ViewProps, type ViewStyle, type PressableProps } from 'react-native';
+import { Pressable, StyleSheet, Text, type ViewProps, type ViewStyle, type PressableProps } from 'react-native';
 import { ChevronDown, BookOpen } from 'lucide-react-native';
 
 import {

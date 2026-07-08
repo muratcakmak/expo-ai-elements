@@ -16,8 +16,8 @@ import {
   type TextInputProps,
   type ViewProps,
 } from 'react-native';
-import { WebView } from '../../utils/webview-shim';
-import { ChevronDown, RefreshCw } from 'lucide-react-native';
+import { WebView } from 'react-native-webview';
+import { ChevronDown } from 'lucide-react-native';
 
 import { cn } from '../../utils/cn';
 import {

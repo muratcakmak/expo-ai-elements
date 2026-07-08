@@ -6,10 +6,8 @@ import React, {
 } from 'react';
 import {
   Image,
-  Pressable,
   Text,
   View,
-  type ImageProps,
   type PressableProps,
   type ViewProps,
 } from 'react-native';

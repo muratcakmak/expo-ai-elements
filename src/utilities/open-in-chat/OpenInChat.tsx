@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, Pressable, Linking, type ViewProps, type PressableProps } from 'react-native';
+import { Text, Linking, type ViewProps, type PressableProps } from 'react-native';
 
 import { cn } from '../../utils/cn';
 import { Button } from '../../primitives/Button';
@@ -150,7 +150,9 @@ function OpenInSeparator(props: OpenInSeparatorProps) {
 
 /* ----------------------------- Provider Items ----------------------------- */
 
-type ProviderItemProps = PressableProps & {
+// Omit children: these forward into DropdownMenuItem, which renders children as a
+// plain node (no Pressable render-function form).
+type ProviderItemProps = Omit<PressableProps, 'children'> & {
   className?: string;
 };
 

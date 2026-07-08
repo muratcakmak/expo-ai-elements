@@ -1,15 +1,25 @@
 import * as React from 'react';
 import { View, Text, Pressable, type ViewProps, type PressableProps } from 'react-native';
-import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from './bottom-sheet-shim';
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
 
 import { cn } from '../utils/cn';
 
 /* ---------------------------------- Context --------------------------------- */
 
+type BottomSheetModalRef = React.ComponentRef<typeof BottomSheetModal>;
+
 type DrawerContextValue = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  sheetRef: React.RefObject<BottomSheet | null>;
+  sheetRef: React.RefObject<BottomSheetModalRef | null>;
+  // Tracks whether the modal is currently presented. Guards present()/dismiss()
+  // so we never call dismiss() on a never-presented modal (which wedges gorhom
+  // 5.x into a DISMISSING status and eats the next present()).
+  presentedRef: React.RefObject<boolean>;
 };
 
 const DrawerContext = React.createContext<DrawerContextValue | null>(null);
@@ -40,7 +50,8 @@ function Drawer({
   const [internalOpen, setInternalOpen] = React.useState(false);
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
-  const sheetRef = React.useRef<BottomSheet>(null);
+  const sheetRef = React.useRef<BottomSheetModalRef>(null);
+  const presentedRef = React.useRef(false);
   const snapPoints = React.useMemo(() => snapPointsProp ?? ['50%', '90%'], [snapPointsProp]);
 
   const handleOpenChange = React.useCallback(
@@ -49,29 +60,29 @@ function Drawer({
         setInternalOpen(next);
       }
       onOpenChange?.(next);
-
-      if (next) {
-        sheetRef.current?.snapToIndex(0);
-      } else {
-        sheetRef.current?.close();
-      }
     },
     [isControlled, onOpenChange],
   );
 
-  // Sync external controlled state
+  // Present / dismiss the modal to mirror the open state (controlled or not).
+  // Guarded by presentedRef so we never dismiss() a modal that was never
+  // presented (mount with open=false, or the render after each swipe/backdrop
+  // dismissal) — that wedges gorhom 5.x into DISMISSING and skips the next
+  // present(), killing every other open cycle.
   React.useEffect(() => {
-    if (isControlled) {
-      if (controlledOpen) {
-        sheetRef.current?.snapToIndex(0);
-      } else {
-        sheetRef.current?.close();
-      }
+    if (open && !presentedRef.current) {
+      presentedRef.current = true;
+      sheetRef.current?.present();
+    } else if (!open && presentedRef.current) {
+      presentedRef.current = false;
+      sheetRef.current?.dismiss();
     }
-  }, [controlledOpen, isControlled]);
+  }, [open]);
 
   return (
-    <DrawerContext.Provider value={{ open, onOpenChange: handleOpenChange, sheetRef }}>
+    <DrawerContext.Provider
+      value={{ open, onOpenChange: handleOpenChange, sheetRef, presentedRef }}
+    >
       {/* Render non-sheet children directly */}
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child) && child.type === DrawerContent) {
@@ -122,14 +133,20 @@ type DrawerContentProps = ViewProps & {
 };
 
 function DrawerContent({ children, className, snapPoints, ...props }: DrawerContentProps) {
-  const { sheetRef, onOpenChange } = useDrawerContext();
+  // Read the context here (still inside the page tree). BottomSheetModal
+  // re-parents its children to the BottomSheetModalProvider host via
+  // @gorhom/portal, so context provided below that host is lost — re-provide
+  // it inside the modal for portaled children (e.g. DrawerClose).
+  const ctx = useDrawerContext();
+  const { sheetRef, open, onOpenChange, presentedRef } = ctx;
 
   const renderBackdrop = React.useCallback(
     (backdropProps: React.ComponentProps<typeof BottomSheetBackdrop>) => (
       <BottomSheetBackdrop
         {...backdropProps}
-        disappearsOnIndex={-1}
         appearsOnIndex={0}
+        disappearsOnIndex={-1}
+        pressBehavior="close"
         opacity={0.5}
       />
     ),
@@ -137,13 +154,22 @@ function DrawerContent({ children, className, snapPoints, ...props }: DrawerCont
   );
 
   return (
-    <BottomSheet
+    <BottomSheetModal
       ref={sheetRef}
-      index={-1}
       snapPoints={snapPoints ?? ['50%', '90%']}
       enablePanDownToClose
+      // gorhom v5 defaults enableDynamicSizing to true; with flex-1 content it
+      // can inject a degenerate measured snap point and open as a sliver.
+      enableDynamicSizing={false}
       backdropComponent={renderBackdrop}
-      onClose={() => onOpenChange(false)}
+      onDismiss={() => {
+        // Sync state back when dismissed via swipe-down or backdrop press.
+        // Clear presentedRef so the open-mirroring effect can present() again.
+        presentedRef.current = false;
+        if (open) {
+          onOpenChange(false);
+        }
+      }}
       handleIndicatorStyle={{
         backgroundColor: '#d1d5db',
         width: 100,
@@ -151,10 +177,12 @@ function DrawerContent({ children, className, snapPoints, ...props }: DrawerCont
         borderRadius: 3,
       }}
     >
-      <BottomSheetView className={cn('flex-1', className)} {...props}>
-        {children}
-      </BottomSheetView>
-    </BottomSheet>
+      <DrawerContext.Provider value={ctx}>
+        <BottomSheetView className={cn('flex-1', className)} {...props}>
+          {children}
+        </BottomSheetView>
+      </DrawerContext.Provider>
+    </BottomSheetModal>
   );
 }
 

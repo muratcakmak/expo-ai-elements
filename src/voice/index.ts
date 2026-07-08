@@ -4,7 +4,7 @@
  * OMC-70: AudioPlayer — expo-audio based audio playback with compound controls
  * OMC-71: SpeechInput — expo-speech-recognition based speech-to-text input
  * OMC-72: Transcription — Streaming transcription display with timestamps
- * OMC-73: MicSelector — Audio input device picker using expo-av
+ * OMC-73: MicSelector — Audio input device picker using expo-audio
  * OMC-74: VoiceSelector — Voice list picker with audio preview
  * OMC-75: Persona — Rive animation persona with static image fallback
  */

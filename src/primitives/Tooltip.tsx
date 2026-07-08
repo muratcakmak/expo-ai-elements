@@ -4,7 +4,6 @@ import {
   Text,
   Pressable,
   type ViewProps,
-  type TextProps,
   type PressableProps,
 } from 'react-native';
 

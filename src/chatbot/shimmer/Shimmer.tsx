@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useRef } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { Animated, StyleSheet, Text, type TextProps, type TextStyle } from 'react-native';
 
 export type ShimmerProps = TextProps & {
@@ -16,7 +16,9 @@ const ShimmerComponent = ({
   style,
   ...props
 }: ShimmerProps) => {
-  const opacity = useRef(new Animated.Value(0.4)).current;
+  // Lazily create a single Animated.Value; useState avoids reading a ref
+  // during render (react-hooks/refs) while keeping the value stable.
+  const [opacity] = useState(() => new Animated.Value(0.4));
 
   useEffect(() => {
     const animation = Animated.loop(

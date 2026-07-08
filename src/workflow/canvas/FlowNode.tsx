@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, type ViewProps } from 'react-native';
+import { View, type ViewProps } from 'react-native';
 
 import { cn } from '../../utils/cn';
 import {

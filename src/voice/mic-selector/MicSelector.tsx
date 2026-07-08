@@ -13,13 +13,14 @@ import {
   View,
   type PressableProps,
   type TextProps,
-  type ViewProps,
 } from 'react-native';
-import * as ExpoAv from 'expo-av';
+import {
+  getRecordingPermissionsAsync,
+  requestRecordingPermissionsAsync,
+} from 'expo-audio';
 import { Check, ChevronsUpDown } from 'lucide-react-native';
 
 import { cn } from '../../utils/cn';
-import { Button } from '../../primitives/Button';
 import {
   Drawer,
   DrawerContent,
@@ -43,6 +44,10 @@ type MicSelectorContextValue = {
   onValueChange: (value: string | undefined) => void;
   loading: boolean;
   error: string | null;
+  /** Whether the OS will still surface a permission prompt on retry. */
+  canAskAgain: boolean;
+  /** Re-run permission request + device enumeration (retry). */
+  loadDevices: () => Promise<void>;
 };
 
 /* -------------------------------- Context -------------------------------- */
@@ -62,62 +67,40 @@ function useMicSelector(): MicSelectorContextValue {
 /* ------------------------------ Hook -------------------------------------- */
 
 /**
- * Hook to enumerate available audio input devices using expo-av.
- * Requests microphone permission and retrieves the list of audio inputs.
+ * Hook to enumerate available audio input devices using expo-audio.
+ * Requests microphone permission. Device enumeration is platform-limited.
  */
 function useAudioDevices() {
   const [devices, setDevices] = useState<AudioInputDevice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState(false);
+  const [canAskAgain, setCanAskAgain] = useState(true);
 
   const loadDevices = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Request microphone permission
-      const { status } = await ExpoAv.Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
+      // expo-audio (SDK 57) exposes only imperative permission APIs.
+      let permission = await getRecordingPermissionsAsync();
+      if (!permission.granted && permission.canAskAgain) {
+        permission = await requestRecordingPermissionsAsync();
+      }
+      if (!permission.granted) {
         setError('Microphone permission not granted');
         setHasPermission(false);
+        setCanAskAgain(permission.canAskAgain);
         return;
       }
 
       setHasPermission(true);
+      setCanAskAgain(true);
 
-      // Get available audio inputs via Recording API
-      // expo-av exposes available inputs through the audio session
-      await ExpoAv.Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-
-      const recording = new ExpoAv.Audio.Recording();
-      await recording.prepareToRecordAsync(
-        ExpoAv.Audio.RecordingOptionsPresets.HIGH_QUALITY,
-      );
-
-      const availableInputs = await recording.getAvailableInputs();
-
-      const audioInputs: AudioInputDevice[] = availableInputs.map(
-        (input) => ({
-          uid: input.uid,
-          name: input.name,
-          type: input.type,
-        }),
-      );
-
-      setDevices(audioInputs);
-
-      // Clean up the temporary recording
-      await recording.stopAndUnloadAsync();
-
-      // Restore audio mode
-      await ExpoAv.Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
-      });
+      // TODO: expo-audio has no input-device enumeration API yet; hardcoded single device until it lands
+      setDevices([
+        { uid: 'default', name: 'Built-in Microphone', type: 'builtin' },
+      ]);
     } catch (caughtError) {
       const message =
         caughtError instanceof Error
@@ -130,10 +113,14 @@ function useAudioDevices() {
   }, []);
 
   useEffect(() => {
+    // Genuine on-mount side effect: requesting mic permission and enumerating
+    // devices is inherently async and must store results in state. There is no
+    // non-effect equivalent, so this is a false positive for set-state-in-effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadDevices();
   }, [loadDevices]);
 
-  return { devices, loading, error, hasPermission, loadDevices };
+  return { devices, loading, error, hasPermission, canAskAgain, loadDevices };
 }
 
 /* --------------------------------- Root ---------------------------------- */
@@ -160,7 +147,8 @@ function MicSelector({
   const [internalValue, setInternalValue] = useState<string | undefined>(
     defaultValue,
   );
-  const { devices, loading, error, loadDevices } = useAudioDevices();
+  const { devices, loading, error, canAskAgain, loadDevices } =
+    useAudioDevices();
 
   const isControlled = controlledValue !== undefined;
   const value = isControlled ? controlledValue : internalValue;
@@ -182,8 +170,10 @@ function MicSelector({
       onValueChange,
       loading,
       error,
+      canAskAgain,
+      loadDevices,
     }),
-    [devices, value, onValueChange, loading, error],
+    [devices, value, onValueChange, loading, error, canAskAgain, loadDevices],
   );
 
   return (
@@ -225,7 +215,8 @@ function MicSelectorTrigger({
 /* ------------------------------ Content ---------------------------------- */
 
 function MicSelectorContentInner() {
-  const { devices, value, onValueChange, loading } = useMicSelector();
+  const { devices, value, onValueChange, loading, error, canAskAgain, loadDevices } =
+    useMicSelector();
 
   return (
     <DrawerContent>
@@ -237,6 +228,26 @@ function MicSelectorContentInner() {
           <Text className="text-sm text-muted-foreground">
             Loading audio inputs...
           </Text>
+        </View>
+      ) : error ? (
+        <View className="items-center justify-center p-8">
+          <Text className="mb-1 text-center text-sm text-muted-foreground">
+            {error}
+          </Text>
+          {!canAskAgain && (
+            <Text className="mb-1 text-center text-xs text-muted-foreground">
+              Enable microphone access in Settings to continue.
+            </Text>
+          )}
+          <Pressable
+            className="mt-3 rounded-md border border-input bg-background px-3 py-2"
+            onPress={() => loadDevices()}
+            accessibilityRole="button"
+          >
+            <Text className="text-sm font-medium text-foreground">
+              Try again
+            </Text>
+          </Pressable>
         </View>
       ) : devices.length === 0 ? (
         <View className="items-center justify-center p-8">
