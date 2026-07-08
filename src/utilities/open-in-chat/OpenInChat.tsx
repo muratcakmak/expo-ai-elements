@@ -150,7 +150,9 @@ function OpenInSeparator(props: OpenInSeparatorProps) {
 
 /* ----------------------------- Provider Items ----------------------------- */
 
-type ProviderItemProps = PressableProps & {
+// Omit children: these forward into DropdownMenuItem, which renders children as a
+// plain node (no Pressable render-function form).
+type ProviderItemProps = Omit<PressableProps, 'children'> & {
   className?: string;
 };
 

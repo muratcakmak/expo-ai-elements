@@ -6,8 +6,7 @@
     "scheme": "expo-ai-elements-example",
     "platforms": [
       "ios",
-      "android",
-      "web"
+      "android"
     ],
     "ios": {
       "bundleIdentifier": "com.example.expoaielements"
@@ -30,9 +29,6 @@
         }
       ],
       "expo-sharing"
-    ],
-    "web": {
-      "output": "server"
-    }
+    ]
   }
 }

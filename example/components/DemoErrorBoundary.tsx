@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, Text } from 'react-native';
+import { Pressable, ScrollView, Text } from 'react-native';
 
 type DemoErrorBoundaryProps = {
   children: React.ReactNode;
@@ -56,6 +56,42 @@ export class DemoErrorBoundary extends React.Component<
           >
             {error.message}
           </Text>
+          {error.stack ? (
+            <>
+              <Text
+                style={{ color: '#b91c1c', fontSize: 11, marginTop: 8 }}
+              >
+                Stack trace
+              </Text>
+              <Text
+                style={{
+                  color: '#dc2626',
+                  fontFamily: 'monospace',
+                  fontSize: 11,
+                  marginTop: 2,
+                }}
+                selectable
+              >
+                {error.stack}
+              </Text>
+            </>
+          ) : null}
+          <Pressable
+            onPress={() => this.setState({ error: null })}
+            style={{
+              alignSelf: 'flex-start',
+              marginTop: 12,
+              borderRadius: 6,
+              borderWidth: 1,
+              borderColor: '#b91c1c',
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+            }}
+          >
+            <Text style={{ color: '#b91c1c', fontWeight: '600', fontSize: 12 }}>
+              Try again
+            </Text>
+          </Pressable>
         </ScrollView>
       );
     }

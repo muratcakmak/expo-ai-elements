@@ -17,6 +17,7 @@ import {
 import {
   BottomSheetModal,
   BottomSheetFlatList,
+  BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
 import { Check, ChevronDown } from 'lucide-react-native';
 
@@ -137,6 +138,19 @@ function Select({
     [items, registerItem, unregisterItem],
   );
 
+  const renderBackdrop = useCallback(
+    (backdropProps: React.ComponentProps<typeof BottomSheetBackdrop>) => (
+      <BottomSheetBackdrop
+        {...backdropProps}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+        pressBehavior="close"
+        opacity={0.5}
+      />
+    ),
+    [],
+  );
+
   return (
     <SelectContext.Provider value={selectCtx}>
       <SelectItemContext.Provider value={itemCtx}>
@@ -148,6 +162,7 @@ function Select({
           enablePanDownToClose
           enableDynamicSizing={false}
           snapPoints={['40%']}
+          backdropComponent={renderBackdrop}
         >
           {/*
             BottomSheetModal re-parents its children to the

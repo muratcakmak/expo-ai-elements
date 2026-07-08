@@ -1,7 +1,16 @@
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
+    // babel-preset-expo auto-registers its OWN react-native-worklets/plugin (and,
+    // via the reanimated branch, reanimated/plugin which re-exports the same
+    // worklets plugin) with NO options — there is no guard that turns that second
+    // instance into a no-op (verified in babel-preset-expo/build/configs/expo.js).
+    // A second optionless worklets instance would run WITHOUT bundleMode and clash
+    // with ours. Disable the preset's auto-registration entirely so only our
+    // bundle-mode instance below runs. BOTH flags are required: worklets:false
+    // alone still falls into the branch that registers reanimated/plugin (which
+    // re-exports the worklets plugin optionless).
+    presets: [['babel-preset-expo', { worklets: false, reanimated: false }]],
     plugins: [
       // Bundle mode is REQUIRED by react-native-streamdown: remend ships a
       // minified dist that classic workletization cannot process (yields

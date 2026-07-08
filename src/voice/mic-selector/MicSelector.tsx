@@ -44,6 +44,10 @@ type MicSelectorContextValue = {
   onValueChange: (value: string | undefined) => void;
   loading: boolean;
   error: string | null;
+  /** Whether the OS will still surface a permission prompt on retry. */
+  canAskAgain: boolean;
+  /** Re-run permission request + device enumeration (retry). */
+  loadDevices: () => Promise<void>;
 };
 
 /* -------------------------------- Context -------------------------------- */
@@ -71,6 +75,7 @@ function useAudioDevices() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState(false);
+  const [canAskAgain, setCanAskAgain] = useState(true);
 
   const loadDevices = useCallback(async () => {
     try {
@@ -79,16 +84,18 @@ function useAudioDevices() {
 
       // expo-audio (SDK 57) exposes only imperative permission APIs.
       let permission = await getRecordingPermissionsAsync();
-      if (!permission.granted) {
+      if (!permission.granted && permission.canAskAgain) {
         permission = await requestRecordingPermissionsAsync();
       }
       if (!permission.granted) {
         setError('Microphone permission not granted');
         setHasPermission(false);
+        setCanAskAgain(permission.canAskAgain);
         return;
       }
 
       setHasPermission(true);
+      setCanAskAgain(true);
 
       // TODO: expo-audio has no input-device enumeration API yet; hardcoded single device until it lands
       setDevices([
@@ -113,7 +120,7 @@ function useAudioDevices() {
     loadDevices();
   }, [loadDevices]);
 
-  return { devices, loading, error, hasPermission, loadDevices };
+  return { devices, loading, error, hasPermission, canAskAgain, loadDevices };
 }
 
 /* --------------------------------- Root ---------------------------------- */
@@ -140,7 +147,8 @@ function MicSelector({
   const [internalValue, setInternalValue] = useState<string | undefined>(
     defaultValue,
   );
-  const { devices, loading, error } = useAudioDevices();
+  const { devices, loading, error, canAskAgain, loadDevices } =
+    useAudioDevices();
 
   const isControlled = controlledValue !== undefined;
   const value = isControlled ? controlledValue : internalValue;
@@ -162,8 +170,10 @@ function MicSelector({
       onValueChange,
       loading,
       error,
+      canAskAgain,
+      loadDevices,
     }),
-    [devices, value, onValueChange, loading, error],
+    [devices, value, onValueChange, loading, error, canAskAgain, loadDevices],
   );
 
   return (
@@ -205,7 +215,8 @@ function MicSelectorTrigger({
 /* ------------------------------ Content ---------------------------------- */
 
 function MicSelectorContentInner() {
-  const { devices, value, onValueChange, loading } = useMicSelector();
+  const { devices, value, onValueChange, loading, error, canAskAgain, loadDevices } =
+    useMicSelector();
 
   return (
     <DrawerContent>
@@ -217,6 +228,26 @@ function MicSelectorContentInner() {
           <Text className="text-sm text-muted-foreground">
             Loading audio inputs...
           </Text>
+        </View>
+      ) : error ? (
+        <View className="items-center justify-center p-8">
+          <Text className="mb-1 text-center text-sm text-muted-foreground">
+            {error}
+          </Text>
+          {!canAskAgain && (
+            <Text className="mb-1 text-center text-xs text-muted-foreground">
+              Enable microphone access in Settings to continue.
+            </Text>
+          )}
+          <Pressable
+            className="mt-3 rounded-md border border-input bg-background px-3 py-2"
+            onPress={() => loadDevices()}
+            accessibilityRole="button"
+          >
+            <Text className="text-sm font-medium text-foreground">
+              Try again
+            </Text>
+          </Pressable>
         </View>
       ) : devices.length === 0 ? (
         <View className="items-center justify-center p-8">

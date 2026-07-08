@@ -3,6 +3,11 @@
  * All primitive UI components used across the library.
  */
 
+// Re-exported so consumers can wrap their app root without importing
+// @gorhom/bottom-sheet directly (required host for the modal-based primitives:
+// Select, Drawer, DropdownMenu).
+export { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './Accordion';
 
 export { Badge, badgeVariants, badgeTextVariants, type BadgeProps } from './Badge';

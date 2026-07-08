@@ -47,6 +47,9 @@ const singletonModules = [
   'expo-font',
   'expo-constants',
   'expo-file-system',
+  // ConversationDownload does `await import('expo-sharing')` — must resolve to the
+  // same tree as the example app's copy.
+  'expo-sharing',
 ];
 config.resolver.extraNodeModules = Object.fromEntries(
   singletonModules.map((name) => [name, path.resolve(__dirname, 'node_modules', name)]),
@@ -65,9 +68,14 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     (name) => moduleName === name || moduleName.startsWith(`${name}/`),
   );
   if (isSingleton) {
-    // Resolve with metro-resolver directly (custom chain stripped): re-entering
-    // context.resolveRequest from INSIDE the bundle-mode wrapper resolves
-    // against the wrong inner resolver.
+    // Resolve with metro-resolver directly, anchored at the example dir and with
+    // resolveRequest stripped, so this forces a plain default resolution that
+    // bypasses the custom chain. Re-running our own chain here would recurse
+    // infinitely through this singleton redirect itself; a default resolution
+    // anchored in example/ picks the example/node_modules copy and stops.
+    // Trade-off: this also bypasses expo's react-native-web aliasing — fine
+    // because web is unsupported (this resolver chain targets native; see README
+    // "Platform support").
     return metroResolve(
       {
         ...context,

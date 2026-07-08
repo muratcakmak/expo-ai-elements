@@ -16,6 +16,10 @@ type DropdownMenuContextValue = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   sheetRef: React.RefObject<BottomSheetModalRef | null>;
+  // Tracks whether the modal is currently presented. Guards present()/dismiss()
+  // so we never call dismiss() on a never-presented modal (which wedges gorhom
+  // 5.x into a DISMISSING status and eats the next present()).
+  presentedRef: React.RefObject<boolean>;
 };
 
 const DropdownMenuContext = React.createContext<DropdownMenuContextValue | null>(null);
@@ -41,6 +45,7 @@ function DropdownMenu({ children, open: controlledOpen, onOpenChange }: Dropdown
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
   const sheetRef = React.useRef<BottomSheetModalRef>(null);
+  const presentedRef = React.useRef(false);
 
   const handleOpenChange = React.useCallback(
     (next: boolean) => {
@@ -52,17 +57,25 @@ function DropdownMenu({ children, open: controlledOpen, onOpenChange }: Dropdown
     [isControlled, onOpenChange],
   );
 
-  // Present / dismiss the modal to mirror the open state.
+  // Present / dismiss the modal to mirror the open state. Guarded by
+  // presentedRef so we never dismiss() a modal that was never presented
+  // (mount with open=false, or the render after each swipe/backdrop dismissal)
+  // — that wedges gorhom 5.x into DISMISSING and skips the next present(),
+  // killing every other open cycle.
   React.useEffect(() => {
-    if (open) {
+    if (open && !presentedRef.current) {
+      presentedRef.current = true;
       sheetRef.current?.present();
-    } else {
+    } else if (!open && presentedRef.current) {
+      presentedRef.current = false;
       sheetRef.current?.dismiss();
     }
   }, [open]);
 
   return (
-    <DropdownMenuContext.Provider value={{ open, onOpenChange: handleOpenChange, sheetRef }}>
+    <DropdownMenuContext.Provider
+      value={{ open, onOpenChange: handleOpenChange, sheetRef, presentedRef }}
+    >
       {children}
     </DropdownMenuContext.Provider>
   );
@@ -108,7 +121,7 @@ function DropdownMenuContent({
   // @gorhom/portal, so context provided below that host is lost — re-provide
   // it inside the modal for any context-consuming children.
   const ctx = useDropdownMenuContext();
-  const { sheetRef, open, onOpenChange } = ctx;
+  const { sheetRef, open, onOpenChange, presentedRef } = ctx;
 
   const renderBackdrop = React.useCallback(
     (backdropProps: React.ComponentProps<typeof BottomSheetBackdrop>) => (
@@ -132,6 +145,8 @@ function DropdownMenuContent({
       backdropComponent={renderBackdrop}
       onDismiss={() => {
         // Sync state back when dismissed via swipe-down or backdrop press.
+        // Clear presentedRef so the open-mirroring effect can present() again.
+        presentedRef.current = false;
         if (open) {
           onOpenChange(false);
         }
@@ -148,7 +163,11 @@ function DropdownMenuContent({
 
 /* ---------------------------------- Item ----------------------------------- */
 
-type DropdownMenuItemProps = PressableProps & {
+// Override PressableProps' `children` (which allows a render fn `(state) =>
+// ReactNode`) with a plain node — this menu item renders children directly, so
+// a function child would throw at runtime.
+type DropdownMenuItemProps = Omit<PressableProps, 'children'> & {
+  children?: React.ReactNode;
   className?: string;
   icon?: React.ReactNode;
   label?: string;
@@ -189,9 +208,7 @@ function DropdownMenuItem({
           {label}
         </Text>
       ) : (
-        // Pressable's `children` may be a render fn; this menu item only ever
-        // receives plain nodes, so render it directly as a node.
-        (children as React.ReactNode)
+        children
       )}
     </Pressable>
   );

@@ -14,15 +14,23 @@ Credit to the Vercel team for the original web AI Elements — this library mirr
 - **Uniwind / Tailwind CSS v4**
 - A **dev client or prebuild** — the library depends on native modules and Fabric, so it does **not** run in Expo Go.
 
+## Platform support
+
+**iOS and Android only.** Web is not supported: the Metro worklets bundle-mode + Uniwind resolver chain (see `example/metro.config.js`) is built for the native runtime and bypasses Expo's react-native-web aliasing, so a production web client bundle is broken. Expo Router API routes still work in dev via Metro, but there is no supported web client target.
+
 ## Install
 
 ```bash
 bun add expo-ai-elements
 ```
 
-Peer requirements: `expo >=57`, `react >=19`, `react-native >=0.86`.
+All native and host-singleton modules are **peer dependencies** — you install them in your own app so there is exactly one copy in the tree. (Bundling them inside the library would ship duplicate native runtimes and trigger invalid-hook / "two copies of React" style crashes in consumer apps.) At minimum you need `expo >=57`, `react >=19`, `react-native >=0.86`, plus:
 
-The package pulls native modules as dependencies (`react-native-reanimated` 4, `react-native-worklets`, `react-native-gesture-handler`, `@gorhom/bottom-sheet`, `react-native-streamdown`, `react-native-enriched-markdown`, `react-native-svg`, `react-native-webview`, `expo-audio`, `expo-image`, `expo-document-picker`, `expo-clipboard`, and more). After installing, rebuild the dev client (`bunx expo run:ios` / `run:android`) so autolinking picks them up.
+- `react-native-reanimated` 4, `react-native-worklets`, `react-native-gesture-handler`, `@gorhom/bottom-sheet`, `react-native-safe-area-context`, `react-native-screens`, `react-native-svg`, `react-native-webview`
+- `react-native-streamdown`, `react-native-enriched-markdown`, `uniwind`, `lucide-react-native`, `@react-native-community/slider`
+- Expo modules: `expo-audio`, `expo-image`, `expo-image-picker`, `expo-document-picker`, `expo-file-system`, `expo-clipboard`, `expo-sharing`, `expo-linking`, `expo-font`, `expo-constants`, `expo-speech-recognition`, `expo-status-bar`
+
+See the package's `peerDependencies` for the exact version ranges. `@rive-app/react-native` is an **optional** peer — only needed if you use the `Persona` Rive avatar. After installing, rebuild the dev client (`bunx expo run:ios` / `run:android`) so autolinking picks up the native modules.
 
 ## Required consumer setup
 
@@ -30,16 +38,20 @@ The library uses `react-native-worklets` **bundle mode** (a `react-native-stream
 
 ### 1. `babel.config.js`
 
-The worklets plugin must be **last**:
+Disable `babel-preset-expo`'s auto-registered worklets/reanimated plugins (both flags required, otherwise a second optionless worklets plugin runs without bundle mode), and add our own worklets plugin **last**:
 
 ```js
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
+    // Both flags required: worklets:false alone still falls into the branch that
+    // registers reanimated/plugin, which re-exports the same worklets plugin.
+    presets: [['babel-preset-expo', { worklets: false, reanimated: false }]],
     plugins: [
-      // Must be last (react-native-streamdown 0.2 requirement)
-      ['react-native-worklets/plugin', { bundleMode: true, workletizableModules: ['remend'] }],
+      // Must be last (react-native-streamdown 0.2 requirement). Use
+      // `importForwarding.moduleNames` — the old `workletizableModules` name does
+      // not exist in react-native-worklets 0.10.
+      ['react-native-worklets/plugin', { bundleMode: true, importForwarding: { moduleNames: ['remend'] } }],
     ],
   };
 };
@@ -83,6 +95,25 @@ Then import it once at your app root (e.g. `app/_layout.tsx`):
 
 ```tsx
 import '../global.css';
+```
+
+### 4. App-root providers
+
+Wrap your app root in `BottomSheetModalProvider` (from `@gorhom/bottom-sheet`), inside a `GestureHandlerRootView`. The `Select`, `Drawer`, and `DropdownMenu` primitives (and the components built on them) present a bottom-sheet modal and **crash at render** if no provider is mounted above them:
+
+```tsx
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+
+export default function RootLayout() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <BottomSheetModalProvider>
+        {/* your navigator / app tree */}
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
+  );
+}
 ```
 
 ## Quickstart
