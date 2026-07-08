@@ -14,12 +14,15 @@ import {
   type TextProps,
   type ViewProps,
 } from 'react-native';
-import BottomSheet, {
+import {
+  BottomSheetModal,
   BottomSheetFlatList,
 } from '@gorhom/bottom-sheet';
 import { Check, ChevronDown } from 'lucide-react-native';
 
 import { cn } from '../utils/cn';
+
+type BottomSheetModalRef = React.ComponentRef<typeof BottomSheetModal>;
 
 /* --------------------------------- Context -------------------------------- */
 
@@ -86,7 +89,7 @@ function Select({
   ...props
 }: SelectProps) {
   const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef<BottomSheetModalRef>(null);
 
   const isControlled = controlledValue !== undefined;
   const value = isControlled ? controlledValue : uncontrolledValue;
@@ -102,11 +105,11 @@ function Select({
   );
 
   const open = useCallback(() => {
-    bottomSheetRef.current?.snapToIndex(0);
+    bottomSheetRef.current?.present();
   }, []);
 
   const close = useCallback(() => {
-    bottomSheetRef.current?.close();
+    bottomSheetRef.current?.dismiss();
   }, []);
 
   const [items, setItems] = useState<SelectItemData[]>([]);
@@ -140,15 +143,24 @@ function Select({
         <View className={cn(className)} {...props}>
           {children}
         </View>
-        <BottomSheet
+        <BottomSheetModal
           ref={bottomSheetRef}
-          index={-1}
           enablePanDownToClose
           enableDynamicSizing={false}
           snapPoints={['40%']}
         >
-          <SelectContentInner />
-        </BottomSheet>
+          {/*
+            BottomSheetModal re-parents its children to the
+            BottomSheetModalProvider host via @gorhom/portal, so context
+            provided below that host is lost — re-provide both contexts for
+            SelectContentInner.
+          */}
+          <SelectContext.Provider value={selectCtx}>
+            <SelectItemContext.Provider value={itemCtx}>
+              <SelectContentInner />
+            </SelectItemContext.Provider>
+          </SelectContext.Provider>
+        </BottomSheetModal>
       </SelectItemContext.Provider>
     </SelectContext.Provider>
   );

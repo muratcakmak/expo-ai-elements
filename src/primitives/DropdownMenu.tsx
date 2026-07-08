@@ -1,15 +1,21 @@
 import * as React from 'react';
 import { View, Text, Pressable, type ViewProps, type PressableProps } from 'react-native';
-import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
 
 import { cn } from '../utils/cn';
 
 /* ---------------------------------- Context --------------------------------- */
 
+type BottomSheetModalRef = React.ComponentRef<typeof BottomSheetModal>;
+
 type DropdownMenuContextValue = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  sheetRef: React.RefObject<BottomSheet | null>;
+  sheetRef: React.RefObject<BottomSheetModalRef | null>;
 };
 
 const DropdownMenuContext = React.createContext<DropdownMenuContextValue | null>(null);
@@ -34,7 +40,7 @@ function DropdownMenu({ children, open: controlledOpen, onOpenChange }: Dropdown
   const [internalOpen, setInternalOpen] = React.useState(false);
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
-  const sheetRef = React.useRef<BottomSheet>(null);
+  const sheetRef = React.useRef<BottomSheetModalRef>(null);
 
   const handleOpenChange = React.useCallback(
     (next: boolean) => {
@@ -42,15 +48,18 @@ function DropdownMenu({ children, open: controlledOpen, onOpenChange }: Dropdown
         setInternalOpen(next);
       }
       onOpenChange?.(next);
-
-      if (next) {
-        sheetRef.current?.expand();
-      } else {
-        sheetRef.current?.close();
-      }
     },
     [isControlled, onOpenChange],
   );
+
+  // Present / dismiss the modal to mirror the open state.
+  React.useEffect(() => {
+    if (open) {
+      sheetRef.current?.present();
+    } else {
+      sheetRef.current?.dismiss();
+    }
+  }, [open]);
 
   return (
     <DropdownMenuContext.Provider value={{ open, onOpenChange: handleOpenChange, sheetRef }}>
@@ -94,14 +103,20 @@ function DropdownMenuContent({
   snapPoints,
   ...props
 }: DropdownMenuContentProps) {
-  const { sheetRef, onOpenChange } = useDropdownMenuContext();
+  // Read the context here (still inside the page tree). BottomSheetModal
+  // re-parents its children to the BottomSheetModalProvider host via
+  // @gorhom/portal, so context provided below that host is lost — re-provide
+  // it inside the modal for any context-consuming children.
+  const ctx = useDropdownMenuContext();
+  const { sheetRef, open, onOpenChange } = ctx;
 
   const renderBackdrop = React.useCallback(
     (backdropProps: React.ComponentProps<typeof BottomSheetBackdrop>) => (
       <BottomSheetBackdrop
         {...backdropProps}
-        disappearsOnIndex={-1}
         appearsOnIndex={0}
+        disappearsOnIndex={-1}
+        pressBehavior="close"
         opacity={0.5}
       />
     ),
@@ -109,19 +124,25 @@ function DropdownMenuContent({
   );
 
   return (
-    <BottomSheet
+    <BottomSheetModal
       ref={sheetRef}
-      index={-1}
       snapPoints={snapPoints ?? ['40%']}
       enablePanDownToClose
       enableDynamicSizing={!snapPoints}
       backdropComponent={renderBackdrop}
-      onClose={() => onOpenChange(false)}
+      onDismiss={() => {
+        // Sync state back when dismissed via swipe-down or backdrop press.
+        if (open) {
+          onOpenChange(false);
+        }
+      }}
     >
-      <BottomSheetView className={cn('p-2', className)} {...props}>
-        {children}
-      </BottomSheetView>
-    </BottomSheet>
+      <DropdownMenuContext.Provider value={ctx}>
+        <BottomSheetView className={cn('p-2', className)} {...props}>
+          {children}
+        </BottomSheetView>
+      </DropdownMenuContext.Provider>
+    </BottomSheetModal>
   );
 }
 
